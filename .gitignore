@@ -107,7 +107,7 @@ fabric.properties
 
 
 # Copyriht
-books/*.pdf
-books/*.epub
-books/*.mobi
+literature/books/*.pdf
+literature/books/*.epub
+literature/books/*.mobi
 
