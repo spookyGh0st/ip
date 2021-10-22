@@ -80,6 +80,23 @@
 # *.ipr
 
 # CMake
+### CMake ###
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+### CMake Patch ###
+# External projects
+*-prefix/
+
 cmake-build-*/
 
 # Mongo Explorer plugin
@@ -90,7 +107,7 @@ cmake-build-*/
 
 # IntelliJ
 out/
-./idea
+./idea/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -111,3 +128,5 @@ literature/books/*.pdf
 literature/books/*.epub
 literature/books/*.mobi
 
+/ip.cbp
+/.idea/
