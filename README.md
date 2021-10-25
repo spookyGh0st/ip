@@ -10,4 +10,4 @@ Bau eines Renderers auf Basis von implizierten Oberflaechen.
 - [ ] Bau eines Tape generators?
 - [ ] Rendering der Scene durch
     - erste Iteration: Sphere Marching 
-    - zweite Iteration: parallel Rendering nach Keeter.
+    - (optional) zweite Iteration: parallel Rendering nach Keeter.
