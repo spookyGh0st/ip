@@ -6,7 +6,7 @@ project(
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_COMPILER "clang++")
-add_executable(ip src/main.cpp src/glad.c)
+add_executable(ip src/main.cpp src/glad.c src/Window.cpp)
 
 
 find_package(glfw3 3.3 REQUIRED)
