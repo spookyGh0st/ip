@@ -7,12 +7,15 @@
 
 int main()
 {
-    auto window { std::make_unique<Window>(Window()) };
+        auto window { std::make_unique<Window>(Window()) };
+
+
 
     // render loop
     while(!window->shouldClose()) {
         // input
         window->processInput();
+        window->move(-0.5,-0.5,-0.5);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -21,7 +24,7 @@ int main()
         window->swapBuffers();
     }
 
-    glfwTerminate();
+    // glfwTerminate();
     return 0;
 }
 

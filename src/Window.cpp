@@ -8,7 +8,7 @@
 class Window {
 private:
     GLFWwindow *glfwWindow;
-    float xPos, yPos, size;
+    float xPos{}, yPos{}, size{};
 
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     {
@@ -42,7 +42,16 @@ public:
         const GLFWvidmode *modes = glfwGetVideoMode(glfwGetPrimaryMonitor());
         xPos = float(modes->width)/2.0f;
         yPos = float(modes->height)/2.0f;
-        move(0,0,0); // set Position and size
+        //move(0,0,0); // set Position and size
+    }
+
+    Window(const Window&) = delete;
+    Window(Window&& other) noexcept {
+        glfwWindow = other.glfwWindow;
+        other.glfwWindow = nullptr;
+        size = other.size;
+        xPos = other.xPos;
+        yPos = other.yPos;
     }
 
     void move(float x, float y, float z){
@@ -63,5 +72,10 @@ public:
 
     void swapBuffers(){
         glfwSwapBuffers(glfwWindow);
+    }
+
+    virtual ~Window(){
+        if (glfwWindow != nullptr)
+            glfwDestroyWindow(glfwWindow);
     }
 };
