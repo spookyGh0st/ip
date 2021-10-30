@@ -4,9 +4,6 @@
 #define IP_SYNTAX_H
 
 
-class Syntax {
-
-};
 
 
 #endif //IP_SYNTAX_H
