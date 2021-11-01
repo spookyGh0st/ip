@@ -3,7 +3,8 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "Window.cpp"
-#include "Syntax.cpp"
+#include "ip/Syntax.hpp"
+#include "ip/GeometricalObject.hpp"
 
 
 int main()
