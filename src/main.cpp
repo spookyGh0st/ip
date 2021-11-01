@@ -3,13 +3,12 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "Window.cpp"
+#include "Syntax.cpp"
 
 
 int main()
 {
-        auto window { std::make_unique<Window>(Window()) };
-
-
+    auto window { std::make_unique<Window>(Window()) };
 
     // render loop
     while(!window->shouldClose()) {
