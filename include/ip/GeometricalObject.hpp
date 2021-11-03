@@ -1,7 +1,7 @@
-#include <memory>
-
 #ifndef IP_GEOMETICALOBJECT_H
 #define IP_GEOMETICALOBJECT_H
+
+#include <memory>
 
 // todo namespaces
 class GeometricalObject {
