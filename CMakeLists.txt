@@ -11,6 +11,7 @@ add_executable(ip src/main.cpp src/glad.c
         src/Syntax.cpp
         include/ip/Syntax.hpp
         src/GeometricalObject.cpp
+        src/Scanner.cpp include/ip/Scanner.hpp
         include/ip/GeometricalObject.hpp)
 
 

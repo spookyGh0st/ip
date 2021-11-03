@@ -1,7 +1,6 @@
 #include <memory>
-#include "ip/Syntax.hpp"
 #include <string>
-#include "ip/GeometricalObject.hpp"
+#include "ip/Syntax.hpp"
 
 std::string Var::draw() const {
     if (type == VarType::X)

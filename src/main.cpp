@@ -3,13 +3,18 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "Window.cpp"
-#include "ip/Syntax.hpp"
-#include "ip/GeometricalObject.hpp"
+#include "ip/Scanner.hpp"
 
 
-int main()
-{
-    auto window { std::make_unique<Window>(Window()) };
+int main() {
+    auto window{std::make_unique<Window>(Window())};
+    std::string expr { "sqrt(x^2+y^2+z^2)+1" };
+    auto s = ip::Scanner(expr);
+    ip::Token t = s.scanToken();
+    while (t.type != ip::TOKEN_EOF) {
+        std::cout << t.data << " " << t.type << std::endl;
+        t = s.scanToken();
+    }
 
     // render loop
     while(!window->shouldClose()) {

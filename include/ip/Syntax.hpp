@@ -1,8 +1,8 @@
-#include <string>
-#include <memory>
-
 #ifndef IP_SYNTAX_HPP
 #define IP_SYNTAX_HPP
+
+#include <string>
+#include <memory>
 
 // todo namespaces
 
