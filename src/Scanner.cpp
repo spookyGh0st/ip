@@ -1,9 +1,11 @@
 #include <iostream>
 #include "ip/Scanner.hpp"
 
-ip::Scanner::Scanner(const std::string_view &source): src(source), start(0), current(0) { }
+using namespace ip;
 
-ip::Token ip::Scanner::scanToken() {
+Scanner::Scanner(const std::string_view &source): src(source), start(0), current(0) { }
+
+Token Scanner::scanToken() {
     skipWhitespace();
     start = current;
     if (isAtEnd())
@@ -27,7 +29,7 @@ ip::Token ip::Scanner::scanToken() {
     }
 }
 
-ip::Token ip::Scanner::number() {
+Token Scanner::number() {
     while (std::isdigit(peek()))
         advance();
     if (peek() == '.' && std::isdigit(peekNext())){
@@ -38,35 +40,35 @@ ip::Token ip::Scanner::number() {
     return makeToken(TOKEN_NUMBER);
 }
 
-ip::Token ip::Scanner::identifier() {
+Token Scanner::identifier() {
     while(std::isalnum(peek()))
         advance();
     return makeToken(TOKEN_IDENTIFIER);
 }
 
-void ip::Scanner::skipWhitespace() {
+void Scanner::skipWhitespace() {
 
 }
 
-ip::Token ip::Scanner::makeToken(TokenType type) {
+Token Scanner::makeToken(TokenType type) {
     auto data = src.substr(start, current-start);
     return Token{ type, data };
 }
 
-bool ip::Scanner::isAtEnd() {
+bool Scanner::isAtEnd() {
     return  (current >= src.length());
 }
 
-char8_t ip::Scanner::peek(){
+char8_t Scanner::peek(){
     return src[current];
 }
 
-char8_t ip::Scanner::peekNext(){
+char8_t Scanner::peekNext(){
     if (isAtEnd()) return '\0';
     return src[current+1];
 }
 
-char8_t ip::Scanner::advance() {
+char8_t Scanner::advance() {
     current++;
     return src[current-1];
 }
