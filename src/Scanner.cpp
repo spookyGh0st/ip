@@ -47,7 +47,8 @@ Token Scanner::identifier() {
 }
 
 void Scanner::skipWhitespace() {
-
+    while (std::isspace(peek()))
+        advance();
 }
 
 Token Scanner::makeToken(TokenType type) {

@@ -8,22 +8,29 @@ Sphere::Sphere(double radius) {
     // jesus fucking christ
     // this is sqrt(x^2 + y^2 + z^2) + n
     // todo I need to find a better way, probably with operation overloading?
-    range = std::make_unique<Plus>(
+    range = std::make_unique<Binary>(
             std::make_unique<Sqrt>(
-                    std::make_unique<Plus>(
-                            std::make_unique<Pow>(
+                    std::make_unique<Binary>(
+                            std::make_unique<Binary>(
                                     std::make_unique<Var>(X),
-                                    std::make_unique<Number>(2.0)),
-                            std::make_unique<Plus>(
-                                    std::make_unique<Pow>(
+                                    std::make_unique<Number>(2.0),
+                                    OP_POW
+                            ),
+                            std::make_unique<Binary>(
+                                    std::make_unique<Binary>(
                                             std::make_unique<Var>(Y),
-                                            std::make_unique<Number>(2.0)),
-                                    std::make_unique<Pow>(
+                                            std::make_unique<Number>(2.0),
+                                            OP_POW),
+                                    std::make_unique<Binary>(
                                             std::make_unique<Var>(Z),
-                                            std::make_unique<Number>(2.0))
-                            )
+                                            std::make_unique<Number>(2.0),
+                                            OP_POW),
+                                    OP_PLUS
+                            ),
+                            OP_PLUS
                     )
             ),
-            std::make_unique<Number>(radius)
+            std::make_unique<Number>(radius),
+            OP_PLUS
     );
 }
