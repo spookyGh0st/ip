@@ -7,7 +7,7 @@ project(
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_COMPILER "clang++")
 add_executable(ip src/main.cpp src/glad.c
-        src/Window.cpp
+        src/Window.cpp include/ip/Window.hpp
         src/Syntax.cpp
         include/ip/Syntax.hpp
         src/GeometricalObject.cpp
