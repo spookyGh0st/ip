@@ -1,5 +1,3 @@
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
 #include <iostream>
 #include <ip/Window.hpp>
 
@@ -30,7 +28,7 @@ Window::Window() {
     }
 
     glfwSetFramebufferSizeCallback(glfwWindow, framebuffer_size_callback);
-    xPos = 800; yPos = 500; size = 800.0;
+    xPos = 800; yPos = 500; size = 200.0;
     const GLFWvidmode *modes = glfwGetVideoMode(glfwGetPrimaryMonitor());
     xPos = float(modes->width)/2.0f;
     yPos = float(modes->height)/2.0f;
@@ -43,10 +41,7 @@ Window::~Window() {
 }
 
 void Window::move(float x, float y, float z) {
-    xPos += x; yPos += y; size += z;
-    glfwSetWindowPos(glfwWindow, int(xPos-size/2),int(yPos-size/2));
-    glfwSetWindowSize(glfwWindow, int(size),int(size));
-    glViewport(0, 0, int(size), int(size));
+    setPosition(xPos + x, yPos + y);
 }
 
 int Window::shouldClose() {
@@ -64,4 +59,28 @@ Window::Window(Window &&other) noexcept {
 void Window::processInput() {
     if(glfwGetKey(glfwWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(glfwWindow, true);
+}
+
+void Window::setPosition(double x, double y) {
+    xPos = x; yPos = y;
+}
+
+void Window::draw() {
+    glfwMakeContextCurrent(glfwWindow);
+
+    //todo maybe move into different function, called on setPosition and setScale?
+    glfwSetWindowPos(glfwWindow, int(xPos-size/2),int(yPos-size/2));
+    int s = std::max(int(size),1);
+    glfwSetWindowSize(glfwWindow, s,s);
+    glViewport(0, 0, int(size), int(size));
+
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    // check and call events and swap the buffers
+    glfwPollEvents();
+    swapBuffers();
+}
+
+void Window::setSize(double s) {
+    size = std::abs(s);
 }
