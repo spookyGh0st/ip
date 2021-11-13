@@ -35,53 +35,31 @@ class Sqrt: public Expr{
 public:
     std::unique_ptr<Expr> body;
 
-    explicit Sqrt(std::unique_ptr<Expr> body);
+    explicit Sqrt(std::unique_ptr<Expr>&& body);
 
     [[nodiscard]] std::string draw() const override;
 };
 
-class Binary{
+enum class Operator{
+    OP_PLUS = 0,
+    OP_MINUS = 1,
+    OP_MULTIPLY = 2,
+    OP_DIVIDE = 3,
+    OP_POW = 4,
+    OP_MODULO = 5,
+    OP_MAXIMAL = 6,
+    OP_MINIMAL = 7,
+};
+
+class Binary: public Expr {
 public:
     std::unique_ptr<Expr> X;
     std::unique_ptr<Expr> Y;
-    Binary(std::unique_ptr<Expr> x, std::unique_ptr<Expr> y);
-    ~Binary() = default;
-};
-
-struct Plus: Expr, Binary{
-    using Binary::Binary;
+    Operator op;
+    Binary(std::unique_ptr<Expr>&& x, std::unique_ptr<Expr>&& y, Operator op);
     [[nodiscard]] std::string draw() const override;
 };
 
-struct Minus: Expr, Binary{
-    using Binary::Binary;
-    [[nodiscard]] std::string draw() const override;
-};
-
-struct Multiply: Expr, Binary{
-    using Binary::Binary;
-    [[nodiscard]] std::string draw() const override;
-};
-
-struct Divide: Expr, Binary{
-    using Binary::Binary;
-    [[nodiscard]] std::string draw() const override;
-};
-
-struct Pow: Expr, Binary{
-    using Binary::Binary;
-    [[nodiscard]] std::string draw() const override;
-};
-
-struct Max: Expr, Binary{
-    using Binary::Binary;
-    [[nodiscard]] std::string draw() const override;
-};
-
-struct Min: Expr, Binary{
-    using Binary::Binary;
-    [[nodiscard]] std::string draw() const override;
-};
 
 #include <memory>
 

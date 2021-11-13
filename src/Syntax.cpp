@@ -17,7 +17,7 @@ std::string Number::draw() const {
 }
 
 
-Sqrt::Sqrt(std::unique_ptr<Expr> body)
+Sqrt::Sqrt(std::unique_ptr<Expr>&& body)
         : body(std::move(body)){}
 
 std::string Sqrt::draw() const {
@@ -25,34 +25,21 @@ std::string Sqrt::draw() const {
 }
 
 
-Binary::Binary(std::unique_ptr<Expr> x, std::unique_ptr<Expr> y)
-        : X(std::move(x)), Y(std::move(y)) {}
+Binary::Binary(std::unique_ptr<Expr>&& x, std::unique_ptr<Expr>&& y, Operator op)
+        : X(std::move(x)), Y(std::move(y)), op(op) {}
 
-std::string Plus::draw() const {
-    return "(" + X->draw() + "+" + Y->draw() + ")";
-}
-
-std::string Minus::draw() const {
-    return "(" + X->draw() + "-" + Y->draw() + ")";
-}
-
-std::string Multiply::draw() const {
-    return "(" + X->draw() + "+" + Y->draw() + ")";
-}
-
-std::string Divide::draw() const {
-    return "(" + X->draw() + "/" + Y->draw() + ")";
-}
-
-std::string Pow::draw() const {
-    return "(" + X->draw() + "^" + Y->draw() + ")";
-}
-
-std::string Max::draw() const {
-    return "max(" + X->draw() + "," + Y->draw() + ")";
-}
-
-std::string Min::draw() const {
-    return "min(" + X->draw() + "," + Y->draw() + ")";
+std::string Binary::draw() const {
+    if(op == Operator::OP_MAXIMAL)
+        return "max(" + X->draw() + "," + Y->draw() + ")";
+    if(op == Operator::OP_MINIMAL)
+        return "min(" + X->draw() + "," + Y->draw() + ")";
+    std::string opString;
+    if (op == Operator::OP_PLUS) opString = "+";
+    else if (op == Operator::OP_MINUS) opString = "-";
+    else if (op == Operator::OP_MULTIPLY) opString = "*";
+    else if (op == Operator::OP_DIVIDE) opString = "/";
+    else if (op == Operator::OP_POW) opString = "^";
+    else if (op == Operator::OP_MODULO) opString = "%";
+    return "(" + X->draw() + opString + Y->draw() + ")";
 }
 
