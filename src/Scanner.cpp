@@ -1,5 +1,5 @@
 #include <iostream>
-#include "ip/Scanner.hpp"
+#include "ip/Scanner.h"
 
 using namespace ip;
 

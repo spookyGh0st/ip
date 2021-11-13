@@ -1,5 +1,5 @@
-#ifndef IP_SYNTAX_HPP
-#define IP_SYNTAX_HPP
+#ifndef IP_SYNTAX_H
+#define IP_SYNTAX_H
 
 #include <string>
 #include <memory>
@@ -61,4 +61,4 @@ public:
 
 #include <memory>
 
-#endif //IP_SYNTAX_HPP
+#endif //IP_SYNTAX_H

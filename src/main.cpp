@@ -1,6 +1,6 @@
 #include <iostream>
-#include "Parser.hpp"
-#include "Display.hpp"
+#include "ip/Parser.hpp"
+#include "ip/Display.h"
 
 void testParsing(){
     std::string expr { "sqrt(x^2+y^2+z^2)+1" };

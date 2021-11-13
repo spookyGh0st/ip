@@ -1,6 +1,6 @@
 
 
-#include "ip/Instruction.hpp"
+#include "ip/Instruction.h"
 
 void testMemory() {
     Binary_Clause bc {

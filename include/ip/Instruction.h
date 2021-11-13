@@ -1,7 +1,7 @@
 
 
-#ifndef IP_INSTRUCTION_HPP
-#define IP_INSTRUCTION_HPP
+#ifndef IP_INSTRUCTION_H
+#define IP_INSTRUCTION_H
 
 #include <cstddef>
 #include <iostream>
@@ -28,7 +28,7 @@ struct Float_Clause: public Clause {
 void testMemory();
 
 
-#endif //IP_INSTRUCTION_HPP
+#endif //IP_INSTRUCTION_H
 
 // ich loope durch, alokiere slots mit den output + input
 

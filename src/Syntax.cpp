@@ -1,6 +1,6 @@
 #include <memory>
 #include <string>
-#include "ip/Syntax.hpp"
+#include "ip/Syntax.h"
 
 std::string Var::draw() const {
     if (type == VarType::X)

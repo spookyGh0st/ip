@@ -2,9 +2,9 @@
 #define IP_PARSER_HPP
 
 
-#include <ip/Syntax.hpp>
+#include <ip/Syntax.h>
 #include <memory>
-#include <ip/Scanner.hpp>
+#include <ip/Scanner.h>
 #include <optional>
 
 namespace ip{

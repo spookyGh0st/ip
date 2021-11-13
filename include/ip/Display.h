@@ -1,8 +1,8 @@
-#ifndef IP_DISPLAY_HPP
-#define IP_DISPLAY_HPP
+#ifndef IP_DISPLAY_H
+#define IP_DISPLAY_H
 
 
-#include <ip/Window.hpp>
+#include <ip/Window.h>
 #include <vector>
 #include <chrono>
 
@@ -26,4 +26,4 @@ public:
     int shouldClose();
 };
 
-#endif //IP_DISPLAY_HPP
+#endif //IP_DISPLAY_H

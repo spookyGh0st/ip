@@ -1,6 +1,6 @@
-#include "ip/Syntax.hpp"
+#include "ip/Syntax.h"
 #include <memory>
-#include "ip/GeometricalObject.hpp"
+#include "ip/GeometricalObject.h"
 
 Sphere::Sphere(double radius) {
     auto a = std::make_unique<int>(5);
