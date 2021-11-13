@@ -34,9 +34,7 @@ public:
 class Sqrt: public Expr{
 public:
     std::unique_ptr<Expr> body;
-
     explicit Sqrt(std::unique_ptr<Expr>&& body);
-
     [[nodiscard]] std::string draw() const override;
 };
 
