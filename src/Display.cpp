@@ -20,13 +20,14 @@ Display::~Display() {
 void Display::update() {
     currentTime = std::chrono::system_clock::now();
     auto deltaTime = currentTime - oldTime;
-    updatePositions();
+    // updatePositions();
     draw();
 }
 
 void Display::createWindow() {
     windows.emplace_back();
-    updatePositions();
+    windows.back().setSize(height/2.0);
+    windows.back().setPosition(monitor_x+(width)/2.0,monitor_y + height /2.0);
 }
 
 void Display::updatePositions() {
