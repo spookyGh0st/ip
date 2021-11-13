@@ -14,23 +14,23 @@ Sphere::Sphere(double radius) {
                             std::make_unique<Binary>(
                                     std::make_unique<Var>(X),
                                     std::make_unique<Number>(2.0),
-                                    OP_POW
+                                    Operator::OP_POW
                             ),
                             std::make_unique<Binary>(
                                     std::make_unique<Binary>(
                                             std::make_unique<Var>(Y),
                                             std::make_unique<Number>(2.0),
-                                            OP_POW),
+                                            Operator::OP_POW),
                                     std::make_unique<Binary>(
                                             std::make_unique<Var>(Z),
                                             std::make_unique<Number>(2.0),
-                                            OP_POW),
-                                    OP_PLUS
+                                            Operator::OP_POW),
+                                    Operator::OP_PLUS
                             ),
-                            OP_PLUS
+                            Operator::OP_PLUS
                     )
             ),
             std::make_unique<Number>(radius),
-            OP_PLUS
+            Operator::OP_PLUS
     );
 }

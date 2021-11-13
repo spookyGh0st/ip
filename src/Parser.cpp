@@ -74,13 +74,13 @@ void Parser::consume(ip::TokenType type, const std::string& expected) {
 
 std::pair<short, short> Parser::bindingPower(Operator op){
     switch (op) {
-        case OP_PLUS: case OP_MINUS:
+        case Operator::OP_PLUS: case Operator::OP_MINUS:
             return std::pair(3,4);
-        case OP_MULTIPLY: case OP_DIVIDE:
+        case Operator::OP_MULTIPLY: case Operator::OP_DIVIDE:
             return std::pair(5,6);
-        case OP_POW: case OP_MODULO:
+        case Operator::OP_POW: case Operator::OP_MODULO:
             return std::pair(7,8);
-        case OP_MAXIMAL: case OP_MINIMAL:
+        case Operator::OP_MAXIMAL: case Operator::OP_MINIMAL:
             return std::pair(9,10);
     }
 }
@@ -88,11 +88,11 @@ std::pair<short, short> Parser::bindingPower(Operator op){
 
 std::optional<Operator> Parser::parseOperator() const {
     switch (current.type) {
-        case TOKEN_PLUS: return OP_PLUS;
-        case TOKEN_MINUS: return OP_MINUS;
-        case TOKEN_STAR: return OP_MULTIPLY;
-        case TOKEN_SLASH: return OP_DIVIDE;
-        case TOKEN_POW: return OP_POW;
+        case TOKEN_PLUS: return Operator::OP_PLUS;
+        case TOKEN_MINUS: return Operator::OP_MINUS;
+        case TOKEN_STAR: return Operator::OP_MULTIPLY;
+        case TOKEN_SLASH: return Operator::OP_DIVIDE;
+        case TOKEN_POW: return Operator::OP_POW;
         default: return std::nullopt;
     }
 }
@@ -102,9 +102,9 @@ std::unique_ptr<Expr> Parser::parseIdentifier() {
    if (previous.data == "sqrt")
        return std::make_unique<Sqrt>(parseParenthesized());
     if (previous.data == "max")
-        return parseBinaryFunction(OP_MAXIMAL);
+        return parseBinaryFunction(Operator::OP_MAXIMAL);
     if (previous.data == "min")
-        return parseBinaryFunction(OP_MINIMAL);
+        return parseBinaryFunction(Operator::OP_MINIMAL);
     if (previous.data == "x")
         return std::make_unique<Var>(X);
     if (previous.data == "y")

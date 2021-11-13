@@ -35,12 +35,12 @@ class Sqrt: public Expr{
 public:
     std::unique_ptr<Expr> body;
 
-    explicit Sqrt(std::unique_ptr<Expr> body);
+    explicit Sqrt(std::unique_ptr<Expr>&& body);
 
     [[nodiscard]] std::string draw() const override;
 };
 
-enum Operator{
+enum class Operator{
     OP_PLUS = 0,
     OP_MINUS = 1,
     OP_MULTIPLY = 2,
@@ -56,7 +56,7 @@ public:
     std::unique_ptr<Expr> X;
     std::unique_ptr<Expr> Y;
     Operator op;
-    Binary(std::unique_ptr<Expr> x, std::unique_ptr<Expr> y, Operator op);
+    Binary(std::unique_ptr<Expr>&& x, std::unique_ptr<Expr>&& y, Operator op);
     [[nodiscard]] std::string draw() const override;
 };
 
