@@ -12,7 +12,7 @@ add_executable(ip src/main.cpp src/glad.c
         include/ip/Syntax.h
         src/GeometricalObject.cpp
         src/Scanner.cpp include/ip/Scanner.h
-        include/ip/GeometricalObject.h src/Parser.cpp include/ip/Parser.hpp src/Display.cpp include/ip/Display.h src/Instruction.cpp include/ip/Instruction.h src/TapeGenerator.cpp include/ip/TapeGenerator.h)
+        include/ip/GeometricalObject.h src/Parser.cpp include/ip/Parser.hpp src/Display.cpp include/ip/Display.h src/Tape.cpp include/ip/Tape.h)
 
 
 find_package(glfw3 3.3 REQUIRED)

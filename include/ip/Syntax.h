@@ -3,6 +3,8 @@
 
 #include <string>
 #include <memory>
+#include <stack>
+#include "Clause.h"
 
 // todo namespaces
 
@@ -10,7 +12,11 @@ enum VarType{ X, Y, Z };
 
 class Expr {
 public:
+    using Tape = std::vector<std::unique_ptr<Clause>>;
+    using Stack = std::stack<uint8_t>;
+
     [[nodiscard]] virtual std::string draw() const = 0;
+    virtual uint8_t createTape(Tape &tape, Stack &stack) = 0;
     virtual ~Expr() = default; // Book Virtual Destructors
 };
 
@@ -18,9 +24,8 @@ class Var:public Expr{
 public:
     VarType type;
     explicit Var(VarType type) : type(type) {}
-
-private:
     [[nodiscard]] std::string draw() const override;
+    uint8_t createTape(Tape &tape, Stack &stack) override;
 };
 
 class Number: public Expr{
@@ -29,6 +34,8 @@ public:
     double value;
 
     [[nodiscard]] std::string draw() const override;
+
+    uint8_t createTape(Tape &tape, Stack &stack) override;
 };
 
 class Sqrt: public Expr{
@@ -36,9 +43,11 @@ public:
     std::unique_ptr<Expr> body;
     explicit Sqrt(std::unique_ptr<Expr>&& body);
     [[nodiscard]] std::string draw() const override;
+
+    uint8_t createTape(Tape &tape, Stack &stack) override;
 };
 
-enum class Operator{
+enum Operator{
     OP_PLUS = 0,
     OP_MINUS = 1,
     OP_MULTIPLY = 2,
@@ -56,6 +65,7 @@ public:
     Operator op;
     Binary(std::unique_ptr<Expr>&& x, std::unique_ptr<Expr>&& y, Operator op);
     [[nodiscard]] std::string draw() const override;
+    uint8_t createTape(Tape &tape, Stack &stack) override;
 };
 
 
