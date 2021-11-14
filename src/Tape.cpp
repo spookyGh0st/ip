@@ -10,7 +10,7 @@ Expr::Tape TapeGenerator::generate() {
     auto tape= std::vector<std::unique_ptr<Clause>>();
     auto stack = std::stack<uint8_t>();
     uint8_t address = 255;
-    for (uint8_t i = 0; i < UINT8_MAX; ++i) {
+    for (uint8_t i = UINT8_MAX; i > 0; --i) {
         stack.push(i);
     }
 

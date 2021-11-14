@@ -12,9 +12,11 @@ std::unique_ptr<Expr> testParsing(){
 };
 
 void testTape(){
-    auto expr = ip::Parser("1+2").parse();
+    auto expr = ip::Parser("sqrt(x^2+y^2+z^2)+1").parse();
     auto tg = TapeGenerator(std::move(expr));
     auto tape = tg.generate();
+    for (auto & i : tape) {
+    }
 }
 
 int main() {

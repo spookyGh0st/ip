@@ -47,6 +47,7 @@ public:
     uint8_t createTape(Tape &tape, Stack &stack) override;
 };
 
+// the values translate to the opCodes and are used both in the syntax tree and the tape.
 enum Operator{
     OP_PLUS = 0,
     OP_MINUS = 1,

@@ -11,7 +11,19 @@ std::string Var::draw() const {
 }
 
 uint8_t Var::createTape(Tape &tape, Stack &stack) {
-    // todo
+    Opcode op; switch (type) {
+        case VarType::X: op = OPCODE_X; break;
+        case VarType::Y: op = OPCODE_Y; break;
+        case VarType::Z: op = OPCODE_Z; break;
+    }
+    auto clause { std::make_unique<Clause>() };
+    auto out { stack.top() };
+    clause->opcode = op;
+    clause->output = out;
+    stack.pop();
+
+    tape.push_back(std::move(clause));
+    return out;
 }
 
 Number::Number(double d) : value{d}{}
@@ -23,9 +35,11 @@ std::string Number::draw() const {
 uint8_t Number::createTape(Tape &tape, Stack &stack) {
     auto out = stack.top();
     stack.pop();
-    auto clause = std::make_unique<Float_Clause>();
+    auto clause = std::make_unique<Clause>();
     clause->output = out;
+    clause->opcode = OPCODE_FLOAT;
     clause->value = float(value);
+
     tape.push_back(std::move(clause));
     return out;
 }
@@ -38,7 +52,18 @@ std::string Sqrt::draw() const {
 }
 
 uint8_t Sqrt::createTape(Expr::Tape &tape, Stack &stack) {
-    // todo
+    auto bodyOut { body->createTape(tape,stack) };
+    stack.push(bodyOut);
+    auto out { stack.top() };
+    stack.pop();
+
+    auto clause = std::make_unique<Clause>();
+    clause->input_A = bodyOut;
+    clause->opcode = OPCODE_SQRT;
+    clause->output = out;
+
+    tape.push_back(std::move(clause));
+    return out;
 }
 
 
@@ -64,12 +89,12 @@ uint8_t Binary::createTape(Expr::Tape &tape, Stack &stack) {
     auto X_out { X->createTape(tape, stack) };
     auto Y_out { Y->createTape(tape, stack) };
 
-    stack.push(X_out);
     stack.push(Y_out);
+    stack.push(X_out);
     auto out { stack.top() };
     stack.pop();
 
-    auto clause = std::make_unique<Binary_Clause>();
+    auto clause = std::make_unique<Clause>();
     clause->input_A = X_out;
     clause->input_B = Y_out;
     clause->opcode = static_cast<Opcode>(op);
