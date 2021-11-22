@@ -17,3 +17,58 @@ Expr::Tape TapeGenerator::generate() {
     expr->createTape(tape,stack);
     return tape;
 }
+
+TapeEmulator::TapeEmulator(Expr::Tape &tape, float x, float y, float z)
+    : tape(tape), X(x), Y(y), Z(z) {}
+
+float TapeEmulator::emulate() {
+    for (current = 0; current < tape.size(); ++current) {
+        emulateClause(tape[current]);
+    }
+    return ram[tape[current].output];
+}
+
+void TapeEmulator::emulateClause(Clause &clause) {
+    switch (clause.opcode) {
+        case OPCODE_PLUS:
+            ram[clause.output] = ram[clause.input_A] + ram[clause.input_B];
+            break;
+        case OPCODE_MINUS:
+            ram[clause.output] = ram[clause.input_A] - ram[clause.input_B];
+            break;
+        case OPCODE_MULTIPLY:
+            ram[clause.output] = ram[clause.input_A] * ram[clause.input_B];
+            break;
+        case OPCODE_DIVIDE:
+            ram[clause.output] = ram[clause.input_A] / ram[clause.input_B];
+            break;
+        case OPCODE_POW:
+            ram[clause.output] = powf(ram[clause.input_A], ram[clause.input_B]);
+            break;
+        case OPCODE_MODULO:
+            ram[clause.output] = fmodf(ram[clause.input_A], ram[clause.input_B]);
+            break;
+        case OPCODE_MAXIMAL:
+            ram[clause.output] = std::max(ram[clause.input_A] , ram[clause.input_B]);
+            break;
+        case OPCODE_MINIMAL:
+            ram[clause.output] = std::min(ram[clause.input_A] , ram[clause.input_B]);
+            break;
+        case OPCODE_X:
+            ram[clause.output] = X;
+            break;
+        case OPCODE_Y:
+            ram[clause.output] = Y;
+            break;
+        case OPCODE_Z:
+            ram[clause.output] = Z;
+            break;
+        case OPCODE_SQRT:
+            ram[clause.output] = sqrtf(ram[clause.input_A]);
+            break;
+        case OPCODE_FLOAT:
+            ram[clause.output] = clause.value;
+            break;
+    }
+}
+

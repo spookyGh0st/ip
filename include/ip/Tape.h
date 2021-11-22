@@ -2,6 +2,8 @@
 #define IP_TAPE_H
 
 #include <vector>
+#include <cmath>
+#include <algorithm>
 #include "memory"
 #include "Syntax.h"
 #include "Clause.h"
@@ -13,10 +15,16 @@ public:
     Expr::Tape generate();
 };
 
-float emulateTape(const Expr::Tape &tape)  {
-    std::vector<float> ram {};
-
-}
+class TapeEmulator{
+    Expr::Tape tape ;
+    float X, Y, Z;
+    int current = 0;
+    float ram[UINT8_MAX] {};
+    void emulateClause(Clause &clause);
+public:
+    TapeEmulator(Expr::Tape &tape, float x, float y, float z);
+    float emulate();
+};
 
 
 #endif //IP_TAPE_H
