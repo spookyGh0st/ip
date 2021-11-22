@@ -13,5 +13,10 @@ public:
     Expr::Tape generate();
 };
 
+float emulateTape(const Expr::Tape &tape)  {
+    std::vector<float> ram {};
+
+}
+
 
 #endif //IP_TAPE_H

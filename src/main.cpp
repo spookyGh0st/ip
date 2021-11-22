@@ -15,7 +15,9 @@ void testTape(){
     auto expr = ip::Parser("sqrt(x^2+y^2+z^2)+1").parse();
     auto tg = TapeGenerator(std::move(expr));
     auto tape = tg.generate();
+    std::cout << "op\tout\tiA\tiB\tvalue" << std::endl;
     for (auto & i : tape) {
+        std::cout << i.print() << std::endl;
     }
 }
 

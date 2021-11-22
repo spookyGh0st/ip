@@ -1,7 +1,8 @@
-
-
 #ifndef IP_CLAUSE_H
 #define IP_CLAUSE_H
+
+#include <vector>
+#include "memory"
 
 enum Opcode: uint8_t {
     OPCODE_PLUS = 0,
@@ -20,16 +21,21 @@ enum Opcode: uint8_t {
     OPCODE_SQRT = 11,
     OPCODE_FLOAT = 12,
 };
-struct Clause {
+
+// note: this wastes 4 byte, but atm is chosen for simplicity and performance reasons
+class alignas(8) Clause {
+public:
     Opcode opcode;    // 1 byte
     uint8_t output;   // 1 byte
-    uint8_t input_A;  // 1 byte
-    uint8_t input_B;  // 1 byte
-    float value;      // 4 byte
+    uint8_t input_A{};  // 1 byte
+    uint8_t input_B{};  // 1 byte
+    float value{};      // 4 byte
+    Clause(Opcode opcode, uint8_t output, uint8_t inputA, uint8_t inputB);
+    Clause(Opcode opcode, uint8_t output, uint8_t inputA);
+    Clause(Opcode opcode, uint8_t output, float value);
+    Clause(Opcode opcode, uint8_t output);
+    [[nodiscard]] std::string print() const;
 };
 
-#include <vector>
-#include "memory"
-#include "Syntax.h"
 
 #endif //IP_CLAUSE_H

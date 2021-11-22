@@ -16,13 +16,9 @@ uint8_t Var::createTape(Tape &tape, Stack &stack) {
         case VarType::Y: op = OPCODE_Y; break;
         case VarType::Z: op = OPCODE_Z; break;
     }
-    auto clause { std::make_unique<Clause>() };
-    auto out { stack.top() };
-    clause->opcode = op;
-    clause->output = out;
-    stack.pop();
+    auto out { stack.top() }; stack.pop();
 
-    tape.push_back(std::move(clause));
+    tape.push_back(Clause(op,out));
     return out;
 }
 
@@ -35,12 +31,7 @@ std::string Number::draw() const {
 uint8_t Number::createTape(Tape &tape, Stack &stack) {
     auto out = stack.top();
     stack.pop();
-    auto clause = std::make_unique<Clause>();
-    clause->output = out;
-    clause->opcode = OPCODE_FLOAT;
-    clause->value = float(value);
-
-    tape.push_back(std::move(clause));
+    tape.push_back(Clause(OPCODE_FLOAT,out,float(value)));
     return out;
 }
 
@@ -57,12 +48,7 @@ uint8_t Sqrt::createTape(Expr::Tape &tape, Stack &stack) {
     auto out { stack.top() };
     stack.pop();
 
-    auto clause = std::make_unique<Clause>();
-    clause->input_A = bodyOut;
-    clause->opcode = OPCODE_SQRT;
-    clause->output = out;
-
-    tape.push_back(std::move(clause));
+    tape.push_back(Clause(OPCODE_SQRT,out,bodyOut));
     return out;
 }
 
@@ -94,13 +80,19 @@ uint8_t Binary::createTape(Expr::Tape &tape, Stack &stack) {
     auto out { stack.top() };
     stack.pop();
 
-    auto clause = std::make_unique<Clause>();
-    clause->input_A = X_out;
-    clause->input_B = Y_out;
-    clause->opcode = static_cast<Opcode>(op);
-    clause->output = out;
+    auto opCode = static_cast<Opcode>(op);
+    tape.push_back(Clause(opCode,out,X_out,Y_out));
 
-    tape.push_back(std::move(clause));
     return out;
 }
 
+// todo
+// - tape printer
+// - tape simulator
+// - erstmal ein datentyp mit clause abeiten
+
+// remember alignas to stretch bytes
+struct alignas(16) RememberAlignas {
+    uint8_t opcode;    // 1 byte
+};
+// opgengl standard buffer layout std140 std430

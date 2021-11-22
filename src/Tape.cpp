@@ -7,14 +7,13 @@ TapeGenerator::TapeGenerator(std::unique_ptr<Expr> &&e):
 }
 
 Expr::Tape TapeGenerator::generate() {
-    auto tape= std::vector<std::unique_ptr<Clause>>();
+    auto tape= std::vector<Clause>();
     auto stack = std::stack<uint8_t>();
     uint8_t address = 255;
     for (uint8_t i = UINT8_MAX; i > 0; --i) {
         stack.push(i);
     }
-
-
+    stack.push(0);
     expr->createTape(tape,stack);
     return tape;
 }

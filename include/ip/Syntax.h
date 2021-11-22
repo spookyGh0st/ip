@@ -6,13 +6,11 @@
 #include <stack>
 #include "Clause.h"
 
-// todo namespaces
-
 enum VarType{ X, Y, Z };
 
 class Expr {
 public:
-    using Tape = std::vector<std::unique_ptr<Clause>>;
+    using Tape = std::vector<Clause>;
     using Stack = std::stack<uint8_t>;
 
     [[nodiscard]] virtual std::string draw() const = 0;
