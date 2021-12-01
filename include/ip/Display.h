@@ -7,7 +7,8 @@
 #include <chrono>
 
 class Display {
-    std::vector<Window> windows{};
+    Window window;
+    ip::Scene scene;
     int monitor_x {},monitor_y{};
     std::chrono::time_point<std::chrono::system_clock> startTime {std::chrono::system_clock::now() };
     std::chrono::time_point<std::chrono::system_clock> currentTime {std::chrono::system_clock::now() };
@@ -16,13 +17,8 @@ public:
     int width, height;
     Display();
     ~Display();
+
     void update();
-    void createWindow();
-
-    void updatePositions();
-
-    void draw();
-
     int shouldClose();
 };
 

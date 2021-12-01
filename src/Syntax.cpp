@@ -72,6 +72,8 @@ std::string Binary::draw() const {
 }
 
 uint8_t Binary::createTape(Expr::Tape &tape, Stack &stack) {
+    // keep in mind, recursion can kill cpp when the stack is to big
+    // use iterative if problems arise
     auto X_out { X->createTape(tape, stack) };
     auto Y_out { Y->createTape(tape, stack) };
 

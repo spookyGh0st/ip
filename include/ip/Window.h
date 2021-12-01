@@ -3,6 +3,7 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "Scene.h"
 
 #define GLFW_MAJOR_VERSION 3
 #define GLFW_MINOR_VERSION 3
@@ -24,9 +25,7 @@ public:
     void setSize(double size);
     int shouldClose();
     void processInput();
-    void swapBuffers(){
-        glfwSwapBuffers(glfwWindow);
-    }
+    void swapBuffers();
     virtual ~Window();
 
     void draw();

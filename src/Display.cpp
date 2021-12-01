@@ -4,13 +4,14 @@
 
 using namespace std::chrono;
 
-Display::Display() {
-    glfwInit();
+Display::Display(): window(Window()), scene(ip::Scene()){
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     glfwGetMonitorPos(monitor,&monitor_x,&monitor_y);
     const GLFWvidmode *modes = glfwGetVideoMode(monitor);
     width = modes->width;
     height = modes->height;
+    window.setSize(std::min(height,width)/2.0);
+    window.setPosition(monitor_x + (width) / 2.0, monitor_y + height / 2.0);
 }
 
 Display::~Display() {
@@ -20,42 +21,17 @@ Display::~Display() {
 void Display::update() {
     currentTime = std::chrono::system_clock::now();
     auto deltaTime = currentTime - oldTime;
-    // updatePositions();
-    draw();
+
+    window.processInput();
+    scene.update(deltaTime, currentTime); // todo fix time
+    glClearColor(0.0f,1.0f,0.0f,1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    scene.render(deltaTime,currentTime); // todo fix time
+    glfwPollEvents();
+    window.swapBuffers();
 }
 
-void Display::createWindow() {
-    windows.emplace_back();
-    windows.back().setSize(height/2.0);
-    windows.back().setPosition(monitor_x+(width)/2.0,monitor_y + height /2.0);
-}
-
-void Display::updatePositions() {
-    for (int i = 0; i < windows.size(); i++){
-        auto ang { (double(i) / double(windows.size())) * 2.0 * E_PI };
-        auto to = (currentTime - startTime).count();
-        ang += double(to)/1000000000;
-        auto radius { std::min(width,height)/4};
-        auto x { (width/2.0) + sin(ang) * radius }; //todo change 100
-        auto y { (height/2.0) + cos(ang) * radius };
-        windows[i].setPosition(monitor_x +x,monitor_y + y);
-
-        auto minSize = double(width)/16.0;
-        windows[i].setSize(0.5*minSize*cos(ang)+minSize);
-    }
-}
-
-void Display::draw() {
-    for (auto & window : windows){
-        window.processInput();
-        window.draw();
-    }
-}
 
 int Display::shouldClose() {
-    for (auto & window : windows){
-        if(window.shouldClose())
-            return window.shouldClose();
-    }
-    return GLFW_FALSE;
+    return window.shouldClose();
 }

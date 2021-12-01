@@ -7,12 +7,20 @@
 #include "memory"
 #include "Syntax.h"
 #include "Clause.h"
+#include "Parser.hpp"
 
 class TapeGenerator {
     std::unique_ptr<Expr> expr;
 public:
     explicit TapeGenerator(std::unique_ptr<Expr>&& expr);
     Expr::Tape generate();
+};
+
+class TapeBuffer {
+    unsigned int id{}; //todo remove {}?
+public:
+    explicit TapeBuffer(Expr::Tape &tape);
+    ~TapeBuffer();
 };
 
 class TapeEmulator{
@@ -25,6 +33,8 @@ public:
     TapeEmulator(Expr::Tape &tape, float x, float y, float z);
     float emulate();
 };
+
+Expr::Tape createTapeFromExprString(std::string &&exprStr);
 
 
 #endif //IP_TAPE_H

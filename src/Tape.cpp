@@ -72,3 +72,20 @@ void TapeEmulator::emulateClause(Clause &clause) {
     }
 }
 
+#include <glad/glad.h>
+
+TapeBuffer::TapeBuffer(Expr::Tape &tape) {
+    glGenBuffers(1, &id);
+    glBindBuffer(GL_UNIFORM_BUFFER,id);
+}
+
+TapeBuffer::~TapeBuffer() {
+    glDeleteBuffers(1,&id);
+}
+
+Expr::Tape createTapeFromExprString(std::string &&exprStr) {
+    auto expr = ip::Parser(exprStr).parse();
+    auto tg = TapeGenerator(std::move(expr));
+    auto tape = tg.generate();
+    return tape;
+}
