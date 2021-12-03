@@ -7,10 +7,28 @@ using namespace ip;
 
 Scene::Scene() :
     shader(ShaderProgram( std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/vert.glsl"), std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/frag.glsl"))),
+    quad(Quad()),
     tape(createTapeFromExprString("sqrt(x^2+y^2+z^2)+1)"))
     {
+    shader.bindTexArr();
+}
 
-    //initialization code
+Scene::~Scene() = default;
+
+void Scene::update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {
+
+}
+
+void Scene::render(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {
+    shader.use();
+    quad.render();
+}
+
+void Scene::onKey(int key, int scancode, int action, int mode) {
+
+}
+
+Quad::Quad() {
     glGenVertexArrays(1, &quad_vao);
     glBindVertexArray(quad_vao);
 
@@ -25,25 +43,14 @@ Scene::Scene() :
 
     glBindVertexArray(0);
     glDeleteBuffers(1, &quad_vbo);
-
-    // todo
-
+    // todo error checking
 }
 
-Scene::~Scene() {
+Quad::~Quad() {
     glDeleteVertexArrays(1, &quad_vao);
 }
 
-void Scene::update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {
-
-}
-
-void Scene::render(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {
-    shader.use();
+void Quad::render() const {
     glBindVertexArray(quad_vao);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-}
-
-void Scene::onKey(int key, int scancode, int action, int mode) {
-
 }

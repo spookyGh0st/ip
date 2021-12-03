@@ -7,20 +7,29 @@
 #include "Syntax.h"
 
 namespace ip{
-    class Scene {
+    class Quad {
     private:
         unsigned  int quad_vao{};
         unsigned  int quad_vbo{};
-        Expr::Tape tape;
+    public:
+        Quad();
+        ~Quad();
+        void render() const;
+    };
+
+    class Scene {
+    private:
         ShaderProgram shader;
+        Quad quad;
+        Expr::Tape tape;
     public:
         Scene();
         ~Scene();
         void update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
         void render(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
         void onKey(int key, int scancode, int action, int mode);
-
     };
+
 }
 
 #endif //IP_SCENE_H
