@@ -4,6 +4,7 @@
 #define IP_SHADERPROGRAM_H
 
 #include <filesystem>
+#include <vector>
 #include "log.h"
 
 class ShaderProgram {
@@ -16,8 +17,11 @@ public:
     ~ShaderProgram();
 
     static unsigned int createProgram(unsigned int vShader, unsigned int fShader);
+    void setIvec2Array(const std::string &name, const std::vector<std::pair<int,int>>& value, const std::string &maxName);
 
     void use() const;
+
+    void bindTexArr();
 };
 
 

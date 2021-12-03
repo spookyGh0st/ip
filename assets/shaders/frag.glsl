@@ -1,7 +1,9 @@
 #version 460 core
 out vec4 color;
+uniform usamplerBuffer tapeSampler;
 
 void main()
 {
-    color = vec4(1,0,1,1);
+    uvec4 tape = texelFetch(tapeSampler, 0);
+    color = tape;
 }

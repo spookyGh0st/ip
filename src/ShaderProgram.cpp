@@ -81,4 +81,25 @@ std::string ShaderProgram::StrFromPath(std::filesystem::path &vert)  {
 
 void ShaderProgram::use() const {
     glUseProgram(programID);
-};
+}
+
+void ShaderProgram::bindTexArr() {
+    unsigned int bufferID;
+    glGenBuffers(1,&bufferID);
+    glBindBuffer(GL_TEXTURE_BUFFER, bufferID);
+
+    unsigned int texID;
+    glGenTextures(1, &texID);
+    glBindTexture(GL_TEXTURE_BUFFER, texID);
+
+    glTexBuffer(GL_TEXTURE_BUFFER,GL_RGBA8UI, bufferID);
+
+    // todo convert tape to this
+    uint8_t data[] { 1,1,0,1 };
+    glBufferStorage(GL_TEXTURE_BUFFER,4,data,0);
+
+
+    // unsigned int blockIndex {glGetUniformBlockIndex(programID, name.c_str()) };
+    // glUniformBlockBinding(programID, blockIndex,  )
+}
+
