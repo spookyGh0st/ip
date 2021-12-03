@@ -5,8 +5,8 @@
 #include "GLFW/glfw3.h"
 #include "Scene.h"
 
-#define GLFW_MAJOR_VERSION 3
-#define GLFW_MINOR_VERSION 3
+#define GLFW_MAJOR_VERSION 4
+#define GLFW_MINOR_VERSION 6
 #include <glm/glm/ext/matrix_float4x4.hpp>
 
 class Window {
