@@ -10,11 +10,12 @@ enum VarType{ X, Y, Z };
 
 class Expr {
 public:
-    using Tape = std::vector<Clause>;
+    using TapeInstructions = std::vector<Clause>;
     using Stack = std::stack<uint8_t>;
+    using TapeConstants = std::vector<float>;
 
     [[nodiscard]] virtual std::string draw() const = 0;
-    virtual uint8_t createTape(Tape &tape, Stack &stack) = 0;
+    virtual uint8_t createTape(TapeInstructions &tape, Stack &stack, TapeConstants &ram) = 0;
     virtual ~Expr() = default; // Book Virtual Destructors
 };
 
@@ -23,7 +24,7 @@ public:
     VarType type;
     explicit Var(VarType type) : type(type) {}
     [[nodiscard]] std::string draw() const override;
-    uint8_t createTape(Tape &tape, Stack &stack) override;
+    uint8_t createTape(TapeInstructions &tape, Stack &stack, TapeConstants &ram) override;
 };
 
 class Number: public Expr{
@@ -33,7 +34,7 @@ public:
 
     [[nodiscard]] std::string draw() const override;
 
-    uint8_t createTape(Tape &tape, Stack &stack) override;
+    uint8_t createTape(TapeInstructions &tape, Stack &stack, TapeConstants &ram) override;
 };
 
 class Sqrt: public Expr{
@@ -42,10 +43,10 @@ public:
     explicit Sqrt(std::unique_ptr<Expr>&& body);
     [[nodiscard]] std::string draw() const override;
 
-    uint8_t createTape(Tape &tape, Stack &stack) override;
+    uint8_t createTape(TapeInstructions &tape, Stack &stack, TapeConstants &ram) override;
 };
 
-// the values translate to the opCodes and are used both in the syntax tree and the tape.
+// the values translate to the opCodes and are used both in the syntax tree and the instructions.
 enum Operator{
     OP_PLUS = 0,
     OP_MINUS = 1,
@@ -64,7 +65,7 @@ public:
     Operator op;
     Binary(std::unique_ptr<Expr>&& x, std::unique_ptr<Expr>&& y, Operator op);
     [[nodiscard]] std::string draw() const override;
-    uint8_t createTape(Tape &tape, Stack &stack) override;
+    uint8_t createTape(TapeInstructions &tape, Stack &stack, TapeConstants &ram) override;
 };
 
 

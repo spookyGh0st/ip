@@ -12,7 +12,7 @@
 class Window {
 private:
     GLFWwindow *glfwWindow;
-    double xPos{}, yPos{}, size{};
+    float xPos{}, yPos{}, width{}, height{};
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 public:
     Window();
@@ -20,15 +20,12 @@ public:
     Window(Window&& other) noexcept;
     glm::mat4 mm { glm::mat4() };
 
-    void move(float x, float y, float z);
-    void setPosition(double x, double y);
-    void setSize(double size);
+    void setPosition(float x, float y);
+    void setSize(float width, float height);
     int shouldClose();
     void processInput();
     void swapBuffers();
     virtual ~Window();
-
-    void draw();
 };
 
 #endif //IP_WINDOW_H

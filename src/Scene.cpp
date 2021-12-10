@@ -8,9 +8,11 @@ using namespace ip;
 Scene::Scene() :
     shader(ShaderProgram( std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/vert.glsl"), std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/frag.glsl"))),
     quad(Quad()),
-    tape(createTapeFromExprString("sqrt(x^2+y^2+z^2)+1)"))
-    {
-    shader.bindTexArr();
+    tape(createTapeFromExprString("min(min(y,sqrt(x*x+(y-1)*(y-1)+(z-6)*(z-6))-1),4)"))
+{
+    shader.use();
+    shader.bindTapeBuffer("tapeSampler", (uint8_t *) (tape.instructions.data()), "tapeSize", tape.instructions.size(), 0);
+    shader.bindRamBuffer("ramSampler", tape.constants.data(), "ramSize", tape.constants.size(), 1);
 }
 
 Scene::~Scene() = default;
@@ -22,6 +24,12 @@ void Scene::update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, st
 void Scene::render(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {
     shader.use();
     quad.render();
+}
+
+void Scene::setResolution(int width, int height) {
+    shader.use();
+    std::string keyResolution { "iResolution" };
+    shader.bindVec2(keyResolution, float(width), float(height));
 }
 
 void Scene::onKey(int key, int scancode, int action, int mode) {

@@ -17,11 +17,16 @@ public:
     ~ShaderProgram();
 
     static unsigned int createProgram(unsigned int vShader, unsigned int fShader);
-    void setIvec2Array(const std::string &name, const std::vector<std::pair<int,int>>& value, const std::string &maxName);
 
     void use() const;
 
-    void bindTexArr();
+    void bind(std::string &name, int value) const;
+
+    void bindUnsignedInt(std::string &name, unsigned int value) const;
+
+    void bindTapeBuffer(std::string name, uint8_t value[], std::string sizeName, unsigned int size, int count) const;
+    void bindRamBuffer(std::string name, float value[], std::string sizeName, unsigned int size, int count) const;
+    void bindVec2(std::string &name, float width, float height) const;
 };
 
 

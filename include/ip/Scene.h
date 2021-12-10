@@ -5,6 +5,7 @@
 
 #include "ShaderProgram.h"
 #include "Syntax.h"
+#include "Tape.h"
 
 namespace ip{
     class Quad {
@@ -21,13 +22,15 @@ namespace ip{
     private:
         ShaderProgram shader;
         Quad quad;
-        Expr::Tape tape;
+        Tape tape;
     public:
         Scene();
         ~Scene();
         void update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
         void render(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
         void onKey(int key, int scancode, int action, int mode);
+
+        void setResolution(int width, int height);
     };
 
 }

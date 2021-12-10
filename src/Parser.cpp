@@ -35,7 +35,8 @@ std::unique_ptr<Expr> Parser::parseAtom() {
     switch (current.type) {
         case TOKEN_NUMBER: return parseNumber();
         case TOKEN_IDENTIFIER: return parseIdentifier();
-        default: throw std::runtime_error("Expected Expression, but saw error");
+        case TOKEN_LEFT_PAREN: return parseParenthesized();
+        default: throw std::runtime_error("Expected Expression, but saw " + std::to_string(current.type));
     }
 }
 
@@ -50,7 +51,6 @@ std::unique_ptr<Expr> Parser::parseNumber() {
     if(ec == std::errc::result_out_of_range){
         throw std::runtime_error("Number is larger then a double: "+std::string{previous.data} + " to a number");
     }
-    // todo debug return values
     return std::make_unique<Number>(number);
 }
 

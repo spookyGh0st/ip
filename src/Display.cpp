@@ -10,8 +10,9 @@ Display::Display(): window(Window()), scene(ip::Scene()){
     const GLFWvidmode *modes = glfwGetVideoMode(monitor);
     width = modes->width;
     height = modes->height;
-    window.setSize(std::min(height,width)/2.0);
-    window.setPosition(monitor_x + (width) / 2.0, monitor_y + height / 2.0);
+    window.setSize(float(width)/2,float(height)/2);
+    window.setPosition(float(monitor_x) + float(width)/2 , float(monitor_y) + float(height) / 2);
+    scene.setResolution(width/2,height/2);
 }
 
 Display::~Display() {

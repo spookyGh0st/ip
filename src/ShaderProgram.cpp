@@ -83,23 +83,52 @@ void ShaderProgram::use() const {
     glUseProgram(programID);
 }
 
-void ShaderProgram::bindTexArr() {
+void ShaderProgram::bindRamBuffer(std::string name, float value[], std::string sizeName, unsigned int size, int count) const {
     unsigned int bufferID;
     glGenBuffers(1,&bufferID);
     glBindBuffer(GL_TEXTURE_BUFFER, bufferID);
 
     unsigned int texID;
     glGenTextures(1, &texID);
+    glActiveTexture(GL_TEXTURE0+count);
+    glBindTexture(GL_TEXTURE_BUFFER, texID);
+
+    glTexBuffer(GL_TEXTURE_BUFFER,GL_R32F, bufferID);
+    // since we have 4 components, set the size to size * 4
+    glBufferStorage(GL_TEXTURE_BUFFER,size*4,value,0);
+    bind(name, count);
+    bindUnsignedInt(sizeName, size);
+}
+
+void ShaderProgram::bindTapeBuffer(std::string name, uint8_t value[], std::string sizeName, unsigned int size, int count) const {
+    unsigned int bufferID;
+    glGenBuffers(1,&bufferID);
+    glBindBuffer(GL_TEXTURE_BUFFER, bufferID);
+
+    unsigned int texID;
+    glGenTextures(1, &texID);
+    glActiveTexture(GL_TEXTURE0+count);
     glBindTexture(GL_TEXTURE_BUFFER, texID);
 
     glTexBuffer(GL_TEXTURE_BUFFER,GL_RGBA8UI, bufferID);
+    // since we have 4 components, set the size to size * 4
+    glBufferStorage(GL_TEXTURE_BUFFER,size * 4,value,0);
+    bind(name, count);
+    bindUnsignedInt(sizeName, size);
+}
 
-    // todo convert tape to this
-    uint8_t data[] { 1,1,0,1 };
-    glBufferStorage(GL_TEXTURE_BUFFER,4,data,0);
+void ShaderProgram::bind(std::string &name, int value) const {
+    auto location { glGetUniformLocation(programID, name.c_str()) };
+    glUniform1i(location, value);
+}
 
+void ShaderProgram::bindUnsignedInt(std::string &name, unsigned int value) const {
+    auto location { glGetUniformLocation(programID, name.c_str()) };
+    glUniform1ui(location, value);
+}
 
-    // unsigned int blockIndex {glGetUniformBlockIndex(programID, name.c_str()) };
-    // glUniformBlockBinding(programID, blockIndex,  )
+void ShaderProgram::bindVec2(std::string &name, float width, float height) const {
+    auto location { glGetUniformLocation(programID, name.c_str()) };
+    glUniform2f(location, width, height);
 }
 

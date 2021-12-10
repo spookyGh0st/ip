@@ -94,10 +94,6 @@ Window::~Window() {
         glfwDestroyWindow(glfwWindow);
 }
 
-void Window::move(float x, float y, float z) {
-    setPosition(xPos + x, yPos + y);
-}
-
 int Window::shouldClose() {
     return glfwWindowShouldClose(glfwWindow);
 }
@@ -105,7 +101,8 @@ int Window::shouldClose() {
 Window::Window(Window &&other) noexcept {
     glfwWindow = other.glfwWindow;
     other.glfwWindow = nullptr;
-    size = other.size;
+    width = other.width;
+    height = other.height;
     xPos = other.xPos;
     yPos = other.yPos;
 }
@@ -115,18 +112,39 @@ void Window::processInput() {
         glfwSetWindowShouldClose(glfwWindow, true);
 }
 
-void Window::setPosition(double x, double y) {
+void Window::setPosition(float x, float y) {
     xPos = x; yPos = y;
-    glfwSetWindowPos(glfwWindow, int(xPos-size/2),int(yPos-size/2));
-    int s = std::max(int(size),1);
-    glfwSetWindowSize(glfwWindow, s,s);
-    glViewport(0, 0, int(size), int(size));
+    glfwSetWindowPos(glfwWindow, int(xPos-width/2),int(yPos-height/2));
+    glfwSetWindowSize(glfwWindow,int(width),int(height));
+    glViewport(0, 0, int(width), int(height));
 }
 
-void Window::setSize(double s) {
-    size = std::abs(s);
+void Window::setSize(float windowWidth, float windowHeight) {
+    this->width = windowWidth;
+    this->height = windowHeight;
 }
 
 void Window::swapBuffers() {
     glfwSwapBuffers(glfwWindow);
 }
+
+/*
+ * 0 : y
+ * 1 : (x-0)^2
+ * 2 : 2
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
