@@ -6,26 +6,27 @@ TapeGenerator::TapeGenerator(std::unique_ptr<Expr> &&e):
 
 }
 
-Expr::Tape TapeGenerator::generate() {
+Tape TapeGenerator::generate() {
     auto tape= std::vector<Clause>();
     auto stack = std::stack<uint8_t>();
+    auto ram = std::vector<float>();
     uint8_t address = 255;
     for (uint8_t i = UINT8_MAX; i > 0; --i) {
         stack.push(i);
     }
     stack.push(0);
-    expr->createTape(tape,stack);
-    return tape;
+    expr->createTape(tape, stack, ram);
+    return Tape{tape, ram};
 }
 
-TapeEmulator::TapeEmulator(Expr::Tape &tape, float x, float y, float z)
+TapeEmulator::TapeEmulator(const Tape& tape, float x, float y, float z)
     : tape(tape), X(x), Y(y), Z(z) {}
 
 float TapeEmulator::emulate() {
-    for (current = 0; current < tape.size(); ++current) {
-        emulateClause(tape[current]);
+    for (current = 0; current < tape.instructions.size(); ++current) {
+        emulateClause(tape.instructions[current]);
     }
-    return ram[tape[current].output];
+    return ram[tape.instructions[current].output];
 }
 
 void TapeEmulator::emulateClause(Clause &clause) {
@@ -67,8 +68,16 @@ void TapeEmulator::emulateClause(Clause &clause) {
             ram[clause.output] = sqrtf(ram[clause.input_A]);
             break;
         case OPCODE_FLOAT:
-            ram[clause.output] = clause.value;
+            ram[clause.output] = tape.constants[clause.input_A];
             break;
     }
 }
 
+#include <glad/glad.h>
+
+Tape createTapeFromExprString(std::string &&exprStr) {
+    auto expr = ip::Parser(exprStr).parse();
+    auto tg = TapeGenerator(std::move(expr));
+    auto tape = tg.generate();
+    return tape;
+}

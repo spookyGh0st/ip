@@ -10,7 +10,7 @@ std::string Var::draw() const {
     return "Z";
 }
 
-uint8_t Var::createTape(Tape &tape, Stack &stack) {
+uint8_t Var::createTape(TapeInstructions &tape, Stack &stack, TapeConstants &ram) {
     Opcode op; switch (type) {
         case VarType::X: op = OPCODE_X; break;
         case VarType::Y: op = OPCODE_Y; break;
@@ -28,10 +28,12 @@ std::string Number::draw() const {
     return std::to_string(value);
 }
 
-uint8_t Number::createTape(Tape &tape, Stack &stack) {
+uint8_t Number::createTape(TapeInstructions &tape, Stack &stack, TapeConstants &ram) {
     auto out = stack.top();
     stack.pop();
-    tape.push_back(Clause(OPCODE_FLOAT,out,float(value)));
+    ram.emplace_back(float(value));
+    auto in = uint8_t(ram.size()-1);
+    tape.push_back(Clause(OPCODE_FLOAT,out,in));
     return out;
 }
 
@@ -42,8 +44,8 @@ std::string Sqrt::draw() const {
     return "sqrt(" + body->draw() + ")";
 }
 
-uint8_t Sqrt::createTape(Expr::Tape &tape, Stack &stack) {
-    auto bodyOut { body->createTape(tape,stack) };
+uint8_t Sqrt::createTape(TapeInstructions &tape, Stack &stack, TapeConstants &ram) {
+    auto bodyOut {body->createTape(tape, stack, ram)};
     stack.push(bodyOut);
     auto out { stack.top() };
     stack.pop();
@@ -71,9 +73,11 @@ std::string Binary::draw() const {
     return "(" + X->draw() + opString + Y->draw() + ")";
 }
 
-uint8_t Binary::createTape(Expr::Tape &tape, Stack &stack) {
-    auto X_out { X->createTape(tape, stack) };
-    auto Y_out { Y->createTape(tape, stack) };
+uint8_t Binary::createTape(TapeInstructions &tape, Stack &stack, TapeConstants &ram) {
+    // keep in mind, recursion can kill cpp when the stack is to big
+    // use iterative if problems arise
+    auto X_out {X->createTape(tape, stack, ram)};
+    auto Y_out {Y->createTape(tape, stack, ram)};
 
     stack.push(Y_out);
     stack.push(X_out);
@@ -82,13 +86,12 @@ uint8_t Binary::createTape(Expr::Tape &tape, Stack &stack) {
 
     auto opCode = static_cast<Opcode>(op);
     tape.push_back(Clause(opCode,out,X_out,Y_out));
-
     return out;
 }
 
 // todo
-// - tape printer
-// - tape simulator
+// - instructions printer
+// - instructions simulator
 // - erstmal ein datentyp mit clause abeiten
 
 // remember alignas to stretch bytes
