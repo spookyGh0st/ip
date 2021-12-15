@@ -13,6 +13,10 @@
 #define OPCODE_SQRT 11
 #define OPCODE_FLOAT 12
 
+#define MAX_STEPS 100
+#define SURFACE_DIST 0.01
+#define MAX_DIST 100 // avoid stepping into infinity
+
 out vec4 color;
 uniform usamplerBuffer tapeSampler;
 uniform uint tapeSize;
@@ -77,11 +81,24 @@ float sceneDistance(in vec3 p){
     float d = min(p.y,sqrt(pow(p.x,2)+pow(p.y-1,2)+pow(p.z-6,2))-1);
     return d;
 }
+vec3 getNormal(in vec3 p) {
+    float d = sceneDistance(p);
+    vec3 n = d - vec3(
+        sceneDistance(p-vec3(SURFACE_DIST,0,0)),
+        sceneDistance(p-vec3(0,SURFACE_DIST,0)),
+        sceneDistance(p-vec3(0,0,SURFACE_DIST))
+    );
+    return normalize(n);
+}
 
+vec3 getLight(in vec3 p) {
+    vec3 lightPos = vec3(0,5,6);
+    vec3 l = normalize(lightPos-p);
+    vec3 n = getNormal(p);
+    float diffuse = dot(n,l);
+    return vec3(diffuse);
+}
 
-#define MAX_STEPS 100
-#define SURFACE_DIST 0.01
-#define MAX_DIST 100 // avoid stepping into infinity
 float march(vec3 rayOrigin, vec3 rayDirection) {
     float originDistance = 0;
     for (int i = 0; i<MAX_STEPS; i++) {
@@ -100,9 +117,10 @@ void main()
     vec3 rayOrigin = vec3(0,1,0);
     vec3 rayDirection = normalize(vec3(normFragPos.x,normFragPos.y,1));
     float dist = march(rayOrigin,rayDirection);
-    vec3 col = vec3(abs(dist)/6);
-    color = vec4(col,1.0);
-    // color = vec4(dist/8,0,0,1);
+
+    vec3 position = rayOrigin + rayDirection*dist;
+    vec3 diffuse = getLight(position);
+    color = vec4(diffuse,1);
 }
 
 // Ableitung von gradient -> normale
