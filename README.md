@@ -5,12 +5,14 @@
 ## Battleplan
 
 Bau eines Renderers auf Basis von implizierten Oberflaechen.
-- [ ] Bau eines simplen opengl Frameworks
+- [x] Bau eines simplen opengl Frameworks
 - [X] Bau eines Expression Parser in einen Syntax Baum zur Berechnung der Oberflaechenfunktion
-- [ ] Bau eines Tape generators?
-- [ ] Rendering der Scene durch
-    - erste Iteration: Sphere Marching 
-    - (optional) zweite Iteration: parallel Rendering nach Keeter.
+- [x] Bau eines Tape generators?
+- [x] Rendering der Scene durch
+    - [x] erste Iteration: Sphere Marching 
+    - [ ] ausbau des Sphere marching mit lichtmodel
+    - [ ] Erklaerung fuer schreckliche performance herausfinden.
+    - [ ] (optional) zweite Iteration: parallel Rendering nach Keeter.
 
 ## Bau
 
