@@ -70,6 +70,21 @@ void emulateClause(in uvec4 clause, in vec3 p) {
     }
 }
 
+float sceneDistanceCapsule(in vec3 p, in vec3 startSphere, in vec3 endSphere, float radius){
+    vec3 capsLength =  endSphere - startSphere;
+    vec3 pointLength = p - startSphere;
+
+    float t = dot(capsLength, pointLength) / dot(capsLength, capsLength);
+    t = clamp(t,0,1);
+    vec3 c = startSphere+t*capsLength;
+    float d = length(p-c) - radius;
+    return d;
+}
+float sphereDistance(in vec3 p, in vec3 position, in float radius){
+    return length(p-position)-radius;
+}
+
+
 float sceneDistance(in vec3 p){
     int i = 0;
     for(; i < tapeSize; ++i) {
@@ -78,9 +93,15 @@ float sceneDistance(in vec3 p){
     }
     uint o = texelFetch(tapeSampler,i).g;
     return ram[o];
-    float d = min(p.y,sqrt(pow(p.x,2)+pow(p.y-1,2)+pow(p.z-6,2))-1);
+    float planet = sphereDistance(p,vec3(-50,0,60),10);
+    float rocket = sceneDistanceCapsule(p,vec3(-40,3,40),vec3(-35,5,40),0.5);
+    float sun = sphereDistance(p,vec3(30,0,60),30);
+    float d = min(sun,planet);
+    d = min(d,rocket);
     return d;
 }
+
+// finite difference method
 vec3 getNormal(in vec3 p) {
     float d = sceneDistance(p);
     vec3 n = d - vec3(
@@ -91,13 +112,6 @@ vec3 getNormal(in vec3 p) {
     return normalize(n);
 }
 
-vec3 getLight(in vec3 p) {
-    vec3 lightPos = vec3(0,5,6);
-    vec3 l = normalize(lightPos-p);
-    vec3 n = getNormal(p);
-    float diffuse = dot(n,l);
-    return vec3(diffuse);
-}
 
 float march(vec3 rayOrigin, vec3 rayDirection) {
     float originDistance = 0;
@@ -110,6 +124,19 @@ float march(vec3 rayOrigin, vec3 rayDirection) {
     return originDistance;
 }
 
+vec3 getLight(in vec3 p) {
+    vec3 lightPos = vec3(0,5,-6);
+    vec3 l = normalize(lightPos-p);
+    vec3 n = getNormal(p);
+    // dot returns between -1 and 1, since both l and n are length 1
+    float diffuse = clamp(dot(n,l),0,1);
+    // shadowing
+    float distance = march(p + n*SURFACE_DIST*2,l);
+    if (distance < length(lightPos-p)){ // in shadow
+        diffuse *= 0.1;
+    }
+    return vec3(diffuse);
+}
 
 void main()
 {
