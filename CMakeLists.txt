@@ -20,6 +20,8 @@ add_executable(ip src/main.cpp src/glad.c
 
 find_package(glfw3 3.3 REQUIRED)
 find_package(OpenGL REQUIRED)
+find_library(portaudio portaudio REQUIRED)
+find_library(sndfile sndfile REQUIRED)
 
 target_include_directories(ip PRIVATE include)
-target_link_libraries(ip PUBLIC glfw OpenGL::GL ${CMAKE_DL_LIBS})
+target_link_libraries(ip PUBLIC glfw OpenGL::GL portaudio sndfile ${CMAKE_DL_LIBS})

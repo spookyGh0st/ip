@@ -3,6 +3,7 @@
 
 int main() {
     glfwInit();
+    testAudio();
     testTape();
     auto display { Display() };
 

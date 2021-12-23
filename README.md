@@ -18,3 +18,5 @@ Bau eines Renderers auf Basis von implizierten Oberflaechen.
 
 The project includes libraries using git submodules when possible.
 Make sure you set those up when working with it.
+Additionally the following libraries have to be installed
+- 
