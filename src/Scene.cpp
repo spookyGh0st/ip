@@ -1,14 +1,16 @@
 #include <filesystem>
 #include <glad/glad.h>
 #include <ip/Tape.h>
+#include <cassert>
 #include "ip/Scene.h"
 
 using namespace ip;
 
-Scene::Scene() :
+Scene::Scene(AudioFile *audioFile) :
     shader(ShaderProgram( std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/vert.glsl"), std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/frag.glsl"))),
     quad(Quad()),
-    tape(createTapeFromExprString("min(min(y,sqrt(x*x+(y-1)*(y-1)+(z-6)*(z-6))-1),4)"))
+    tape(createTapeFromExprString("min(min(y,sqrt(x*x+(y-1)*(y-1)+(z-6)*(z-6))-1),4)")),
+    audioCursor(audioFile)
 {
     shader.use();
     shader.bindTapeBuffer("tapeSampler", (uint8_t *) (tape.instructions.data()), "tapeSize", tape.instructions.size(), 0);
@@ -17,8 +19,26 @@ Scene::Scene() :
 
 Scene::~Scene() = default;
 
+float fa[64*2];
 void Scene::update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {
-
+    auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(dt).count();
+    if (millisec > 1){
+        // todo rewrite all this
+        // todo change to vector?
+        auto sr = audioCursor.audioFile->sfInfo.samplerate;
+        auto framesPerBuffer  = millisec * sr / 1000;
+        framesPerBuffer = 64;
+        long n = framesPerBuffer * audioCursor.audioFile->sfInfo.channels;
+        audioCursor.read(framesPerBuffer, fa);
+        float output = 0;
+        for (int i = 0; i < framesPerBuffer*2; ++i) {
+            output += std::abs(fa[i]);
+        }
+        output /= float(framesPerBuffer*2);
+        std::cout << output <<std::endl;
+        std::string name = "pulse";
+        shader.bindFloat(name,output);
+    }
 }
 
 void Scene::render(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {

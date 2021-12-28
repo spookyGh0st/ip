@@ -21,6 +21,7 @@ public:
     void use() const;
 
     void bind(std::string &name, int value) const;
+    void bindFloat(std::string &name, float value) const;
 
     void bindUnsignedInt(std::string &name, unsigned int value) const;
 

@@ -13,6 +13,7 @@ Bau eines Renderers auf Basis von implizierten Oberflaechen.
     - [ ] ausbau des Sphere marching mit lichtmodel
     - [ ] Erklaerung fuer schreckliche performance herausfinden.
     - [ ] (optional) zweite Iteration: parallel Rendering nach Keeter.
+- [ ] Doc schreiben
 
 ## Bau
 

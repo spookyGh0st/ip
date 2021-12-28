@@ -15,7 +15,7 @@ add_executable(ip src/main.cpp src/glad.c
         src/GeometricalObject.cpp include/ip/GeometricalObject.h
         src/Parser.cpp include/ip/Parser.hpp src/Display.cpp include/ip/Display.h src/Tape.cpp include/ip/Tape.h src/Scene.cpp include/ip/Scene.h src/ShaderProgram.cpp include/ip/ShaderProgram.h
         include/ip/log.h src/log.cpp
-        src/test.cpp include/ip/test.h)
+        src/test.cpp include/ip/test.h src/Audio.cpp include/ip/Audio.h)
 
 
 find_package(glfw3 3.3 REQUIRED)

@@ -6,6 +6,7 @@
 #include "ShaderProgram.h"
 #include "Syntax.h"
 #include "Tape.h"
+#include "Audio.h"
 
 namespace ip{
     class Quad {
@@ -23,16 +24,18 @@ namespace ip{
         ShaderProgram shader;
         Quad quad;
         Tape tape;
+        AudioCursor audioCursor;
     public:
-        Scene();
+        Scene(AudioFile *audioFile);
         ~Scene();
         void update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
         void render(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
         void onKey(int key, int scancode, int action, int mode);
 
         void setResolution(int width, int height);
-    };
 
+        void setAudioCursor(AudioCursor cursor);
+    };
 }
 
 #endif //IP_SCENE_H

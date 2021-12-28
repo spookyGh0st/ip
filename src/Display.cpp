@@ -1,10 +1,14 @@
-#include <iostream>
 #include "ip/Display.h"
-#define E_PI 3.1415926535897932384626433832795028841971693993751058209749445923078164062
 
 using namespace std::chrono;
+#define audioPath "/home/user/Music/2 Mello - Sounds Of Tokyo-To Future/2 Mello - Sounds Of Tokyo-To Future - 13 Poison Jam (Part II).ogg"
+#define tmpPath "/home/user/Music/2 Mello - Sounds Of Tokyo-To Future/2 Mello - Sounds Of Tokyo-To Future - 14 Chainsaw Funk.ogg"
 
-Display::Display(): window(Window()), scene(ip::Scene()){
+Display::Display()
+: sceneAudioFile(audioPath), af(audioPath), apb(&af),
+window(Window()), scene(ip::Scene(&sceneAudioFile))
+{
+    // graphic setup
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     glfwGetMonitorPos(monitor,&monitor_x,&monitor_y);
     const GLFWvidmode *modes = glfwGetVideoMode(monitor);
@@ -13,6 +17,9 @@ Display::Display(): window(Window()), scene(ip::Scene()){
     window.setSize(float(width)/2,float(height)/2);
     window.setPosition(float(monitor_x) + float(width)/2 , float(monitor_y) + float(height) / 2);
     scene.setResolution(width/2,height/2);
+
+    currentTime = std::chrono::system_clock::now();
+    apb.play();
 }
 
 Display::~Display() {
@@ -22,6 +29,8 @@ Display::~Display() {
 void Display::update() {
     currentTime = std::chrono::system_clock::now();
     auto deltaTime = currentTime - oldTime;
+    auto time = startTime - currentTime;
+    oldTime = currentTime;
 
     window.processInput();
     scene.update(deltaTime, currentTime); // todo fix time

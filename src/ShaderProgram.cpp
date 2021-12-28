@@ -121,6 +121,10 @@ void ShaderProgram::bind(std::string &name, int value) const {
     auto location { glGetUniformLocation(programID, name.c_str()) };
     glUniform1i(location, value);
 }
+void ShaderProgram::bindFloat(std::string &name, float value) const {
+    auto location { glGetUniformLocation(programID, name.c_str()) };
+    glUniform1f(location, value);
+}
 
 void ShaderProgram::bindUnsignedInt(std::string &name, unsigned int value) const {
     auto location { glGetUniformLocation(programID, name.c_str()) };
