@@ -23,7 +23,8 @@ uniform uint tapeSize;
 uniform samplerBuffer ramSampler;
 uniform uint ramSize;
 uniform vec2 iResolution;
-uniform float pulse;
+uniform float pulseL;
+uniform float pulseR;
 
 float ram[2^8];
 
@@ -94,9 +95,9 @@ float sceneDistance(in vec3 p){
     // }
     // uint o = texelFetch(tapeSampler,i).g;
     // return ram[o];
-    float planet = sphereDistance(p,vec3(-50,0,60),10*(1+pulse));
+    float planet = sphereDistance(p,vec3(-50,0,60),10*(1+pulseL));
     float rocket = sceneDistanceCapsule(p,vec3(-40,3,40),vec3(-35,5,40),0.5);
-    float sun = sphereDistance(p,vec3(30,0,60),30);
+    float sun = sphereDistance(p,vec3(30,0,60),30*(1+pulseR));
     float d = min(sun,planet);
     d = min(d,rocket);
     return d;

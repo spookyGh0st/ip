@@ -19,25 +19,25 @@ Scene::Scene(AudioFile *audioFile) :
 
 Scene::~Scene() = default;
 
-float fa[64*2];
+// todo better sync, fix delay, maybe predict or what?
 void Scene::update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {
     auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(dt).count();
     if (millisec > 1){
-        // todo rewrite all this
-        // todo change to vector?
         auto sr = audioCursor.audioFile->sfInfo.samplerate;
         auto framesPerBuffer  = millisec * sr / 1000;
-        framesPerBuffer = 64;
         long n = framesPerBuffer * audioCursor.audioFile->sfInfo.channels;
-        audioCursor.read(framesPerBuffer, fa);
-        float output = 0;
-        for (int i = 0; i < framesPerBuffer*2; ++i) {
-            output += std::abs(fa[i]);
+        audioBuffer.reserve(n);
+        audioCursor.read(framesPerBuffer, audioBuffer.data());
+        float outputL = 0;
+        float outputR = 0;
+        for (int i = 0; i < n; i+=2) {
+            outputL += std::abs(audioBuffer[i]);
+            outputR += std::abs(audioBuffer[i+1]);
         }
-        output /= float(framesPerBuffer*2);
-        std::cout << output <<std::endl;
-        std::string name = "pulse";
-        shader.bindFloat(name,output);
+        outputL /= float(framesPerBuffer);
+        outputR /= float(framesPerBuffer);
+        shader.bindFloat(keyPulseL,outputL);
+        shader.bindFloat(keyPulseR,outputR);
     }
 }
 

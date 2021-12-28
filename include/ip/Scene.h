@@ -25,6 +25,9 @@ namespace ip{
         Quad quad;
         Tape tape;
         AudioCursor audioCursor;
+        std::vector<float> audioBuffer {};
+        std::string keyPulseL = "pulseL";
+        std::string keyPulseR = "pulseR";
     public:
         Scene(AudioFile *audioFile);
         ~Scene();
