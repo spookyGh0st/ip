@@ -8,16 +8,17 @@
 #include "Audio.h"
 
 class Display {
+    AudioFile audioVisualizationFile;
+    AudioFile audioPlaybackFile;
+    AudioPlayback audioPlayback;
     Window window;
     ip::Scene scene;
+
     int monitor_x {},monitor_y{};
     std::chrono::time_point<std::chrono::system_clock> startTime {std::chrono::system_clock::now() };
     std::chrono::time_point<std::chrono::system_clock> currentTime {std::chrono::system_clock::now() };
     std::chrono::time_point<std::chrono::system_clock> oldTime { std::chrono::system_clock::now() };
 
-    AudioFile af;
-    AudioFile sceneAudioFile;
-    AudioPlayback apb;
 public:
     int width, height;
     Display();

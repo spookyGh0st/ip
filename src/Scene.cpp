@@ -6,11 +6,12 @@
 
 using namespace ip;
 
-Scene::Scene(AudioFile *audioFile) :
-    shader(ShaderProgram( std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/vert.glsl"), std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/frag.glsl"))),
-    quad(Quad()),
-    tape(createTapeFromExprString("min(min(y,sqrt(x*x+(y-1)*(y-1)+(z-6)*(z-6))-1),4)")),
-    audioCursor(audioFile)
+Scene::Scene(AudioFile *audioVisualization, AudioFile *audioPlayBackCur) :
+        shader(ShaderProgram( std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/vert.glsl"), std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/frag.glsl"))),
+        quad(Quad()),
+        tape(createTapeFromExprString("min(min(y,sqrt(x*x+(y-1)*(y-1)+(z-6)*(z-6))-1),4)")),
+        audioVisualizationFile(audioVisualization),
+        audioPlaybackFile(audioPlayBackCur)
 {
     shader.use();
     shader.bindTapeBuffer("tapeSampler", (uint8_t *) (tape.instructions.data()), "tapeSize", tape.instructions.size(), 0);
@@ -23,11 +24,11 @@ Scene::~Scene() = default;
 void Scene::update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {
     auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(dt).count();
     if (millisec > 1){
-        auto sr = audioCursor.audioFile->sfInfo.samplerate;
-        auto framesPerBuffer  = millisec * sr / 1000;
-        long n = framesPerBuffer * audioCursor.audioFile->sfInfo.channels;
+        auto framesPerBuffer  = millisec * audioVisualizationFile->sfInfo.samplerate / 1000;
+        audioVisualizationFile->position = audioPlaybackFile->position-framesPerBuffer;
+        long n = framesPerBuffer * audioVisualizationFile->sfInfo.channels;
         audioBuffer.reserve(n);
-        audioCursor.read(framesPerBuffer, audioBuffer.data());
+        audioVisualizationFile->read(framesPerBuffer, audioBuffer.data());
         float outputL = 0;
         float outputR = 0;
         for (int i = 0; i < n; i+=2) {

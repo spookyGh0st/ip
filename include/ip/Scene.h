@@ -24,20 +24,19 @@ namespace ip{
         ShaderProgram shader;
         Quad quad;
         Tape tape;
-        AudioCursor audioCursor;
+        AudioFile *audioVisualizationFile;
+        AudioFile *audioPlaybackFile;
         std::vector<float> audioBuffer {};
         std::string keyPulseL = "pulseL";
         std::string keyPulseR = "pulseR";
     public:
-        Scene(AudioFile *audioFile);
+        Scene(AudioFile *audioVisualization, AudioFile *audioPlaybackCursor);
         ~Scene();
         void update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
         void render(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
         void onKey(int key, int scancode, int action, int mode);
 
         void setResolution(int width, int height);
-
-        void setAudioCursor(AudioCursor cursor);
     };
 }
 

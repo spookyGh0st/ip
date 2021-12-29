@@ -2,10 +2,11 @@
 #include "ip/test.h"
 #include "ip/Audio.h"
 
+
+
 int main() {
     auto start = std::chrono::steady_clock::now();
     glfwInit();
-    testTape();
 
     auto display = Display();
     auto startupTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start).count();

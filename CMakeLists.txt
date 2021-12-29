@@ -25,3 +25,4 @@ find_library(sndfile sndfile REQUIRED)
 
 target_include_directories(ip PRIVATE include)
 target_link_libraries(ip PUBLIC glfw OpenGL::GL portaudio sndfile ${CMAKE_DL_LIBS})
+target_compile_options(ip PRIVATE -Wall -Wextra)

@@ -13,9 +13,10 @@
 #define OPCODE_SQRT 11
 #define OPCODE_FLOAT 12
 
-#define MAX_STEPS 100
-#define SURFACE_DIST 0.01
+#define MAX_STEPS 10000
+#define SURFACE_DIST 0.001
 #define MAX_DIST 100 // avoid stepping into infinity
+#define PI 3.1415926538
 
 out vec4 color;
 uniform usamplerBuffer tapeSampler;
@@ -72,7 +73,31 @@ void emulateClause(in uvec4 clause, in vec3 p) {
     }
 }
 
-float sceneDistanceCapsule(in vec3 p, in vec3 startSphere, in vec3 endSphere, float radius){
+// our lord and saviour todo understand
+// https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
+float smoothSubtraction(float d1, float d2, float k)
+{
+    float h = max(k-abs(-d1-d2),0.0);
+    return max(-d1, d2) + h*h*0.25/k;
+    // float h = clamp( 0.5 - 0.5*(d2+d1)/k, 0.0, 1.0 );
+    // return mix( d2, -d1, h ) + k*h*(1.0-h);
+}
+
+float smoothUnion(float d1, float d2, float k)
+{
+    float h = max(k-abs(d1-d2),0.0);
+    return min(d1, d2) - h*h*0.25/k;
+    //float h = clamp( 0.5 + 0.5*(d2-d1)/k, 0.0, 1.0 );
+    //return mix( d2, d1, h ) - k*h*(1.0-h);
+}
+
+
+float sceneDistanceCuboid(in vec3 p, in vec3 center, in vec3 size){
+    float distance = length(max(abs(p-center)-size,0));
+    return distance;
+}
+
+float capsuleDistance(in vec3 p, in vec3 startSphere, in vec3 endSphere, float radius){
     vec3 capsLength =  endSphere - startSphere;
     vec3 pointLength = p - startSphere;
 
@@ -87,6 +112,7 @@ float sphereDistance(in vec3 p, in vec3 position, in float radius){
 }
 
 
+
 float sceneDistance(in vec3 p){
     // int i = 0;
     // for(; i < tapeSize; ++i) {
@@ -95,12 +121,21 @@ float sceneDistance(in vec3 p){
     // }
     // uint o = texelFetch(tapeSampler,i).g;
     // return ram[o];
-    float planet = sphereDistance(p,vec3(-50,0,60),10*(1+pulseL));
-    float rocket = sceneDistanceCapsule(p,vec3(-40,3,40),vec3(-35,5,40),0.5);
-    float sun = sphereDistance(p,vec3(30,0,60),30*(1+pulseR));
-    float d = min(sun,planet);
-    d = min(d,rocket);
-    return d;
+    // float planet = sphereDistance(p,vec3(-50,0,60),10*(1+pulseL));
+    // float rocket = sceneDistanceCapsule(p,vec3(-40*(1-pulseL),3,40),vec3(-35*(1-pulseR),5,40),0.5);
+    // float sun = sphereDistance(p,vec3(30,0,60),30*(1+pulseR));
+    float boxL = sceneDistanceCuboid(p,vec3(-5,2,10),vec3(2,4,2));
+    float boxLS = sphereDistance(p,vec3(-5,2,8),1+min(pulseL,1));
+    boxL = smoothSubtraction(boxLS, boxL, 0.25);
+    float boxR = sceneDistanceCuboid(p,vec3(5,2,10),vec3(2,4,2));
+    float boxRS = sphereDistance(p,vec3(5,2,8),1+pulseR);
+    boxR = smoothSubtraction(boxRS, boxR, 0.25);
+    float d = min(boxL,boxR);
+    float connectorb = capsuleDistance(p,vec3(-2,2.1,11),vec3(3,2,11.2),0+min(pulseR,1));
+    float connectort = capsuleDistance(p,vec3(-3,4,11),vec3(3,4.1,10.8),0+min(pulseR,1));
+    d = smoothUnion(connectorb,d,2.5);
+    d = smoothUnion(connectort,d,1.3);
+    return min(d,p.y);
 }
 
 // finite difference method
@@ -137,14 +172,15 @@ vec3 getLight(in vec3 p) {
     if (distance < length(lightPos-p)){ // in shadow
         diffuse *= 0.1;
     }
-    return vec3(diffuse);
+    vec3 color = vec3(min(0.2+pulseL +pulseR, 1)*diffuse);
+    return color;
 }
 
 void main()
 {
     vec2 normFragPos = (gl_FragCoord.xy-0.5*iResolution)/iResolution.y;
-    vec3 rayOrigin = vec3(0,1,0);
-    vec3 rayDirection = normalize(vec3(normFragPos.x,normFragPos.y,1));
+    vec3 rayOrigin = vec3(0,0.2,0);
+    vec3 rayDirection = normalize(vec3(normFragPos.x,normFragPos.y+0.3,1));
     float dist = march(rayOrigin,rayDirection);
 
     vec3 position = rayOrigin + rayDirection*dist;

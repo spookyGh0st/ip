@@ -1,12 +1,8 @@
-
-
 #include <iostream>
-#include <atomic>
-#include <cassert>
 #include "ip/Audio.h"
 #include "ip/log.h"
 
-/* This routine will be called by the PortAudio engine when audio is needed.
+/* This routine will be called by the PortAudio engine when audioPlayback is needed.
  * It may called at interrupt level on some machines so don't do anything
  * that could mess up the system like calling malloc() or free().
 */
@@ -14,13 +10,13 @@ int paCallback(const void *inputBuffer, void *outputBuffer, unsigned long frames
                const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData) {
 
     /* Cast data passed through stream to our structure. */
-    auto *data = (AudioCursor*)userData;
+    auto *data = (AudioFile*)userData;
     auto *out = (float *) outputBuffer;
     data->read(framesPerBuffer, out);
     return paContinue;
 }
 
-void AudioFile::checkSfError(int err){
+void AudioFile::checkSfError(int err) const{
     if (err != SF_ERR_NO_ERROR){
         logError("LibsndFile error:");
         char errorLog[512];
@@ -39,20 +35,20 @@ AudioFile::~AudioFile() {
 }
 
 // similar to https://pastebin.com/2TuuU4K3
-void AudioCursor::read(unsigned long framesPerBuffer, float *cursor) {
+void AudioFile::read(unsigned long framesPerBuffer, float *cursor) {
     unsigned long thisSize = framesPerBuffer;
     unsigned long thisRead;
     while (thisSize > 0)
     {
         // seek to our current file position
-        sf_seek(audioFile->sndFile, int(position), SEEK_SET);
+        sf_seek(sndFile, int(position), SEEK_SET);
 
         // are we going to read past the end of the file?
         // if we are, only read to the end of the file
         // and then loop to the beginning of the file
-        if (thisSize > (audioFile->sfInfo.frames - position))
+        if (thisSize > (sfInfo.frames - position))
         {
-            thisRead = audioFile->sfInfo.frames - position;
+            thisRead = sfInfo.frames - position;
             position = 0;
         }
         else
@@ -66,15 +62,13 @@ void AudioCursor::read(unsigned long framesPerBuffer, float *cursor) {
         /* since our output format and channel interleaving is the same as
     sf_readf_int's requirements */
         /* we'll just read straight into the output buffer */
-        sf_readf_float(audioFile->sndFile, cursor, long(thisRead));
+        sf_readf_float(sndFile, cursor, long(thisRead));
         /* increment the output cursor*/
         // cursor += thisRead;
         /* decrement the number of samples left to process */
         thisSize -= thisRead;
     }
 }
-
-AudioCursor::AudioCursor(AudioFile *audioFile) : audioFile(audioFile) {}
 
 void checkPaError(int err){
     if (err != paNoError){
@@ -83,8 +77,8 @@ void checkPaError(int err){
     }
 }
 
-AudioPlayback::AudioPlayback(AudioFile *audioFile)
-    :cursor(AudioCursor(audioFile)) {
+AudioPlayback::AudioPlayback(AudioFile *af)
+    :audioFile(af) {
     auto err = Pa_Initialize();
     checkPaError(err);
     err = Pa_OpenDefaultStream(
@@ -95,7 +89,7 @@ AudioPlayback::AudioPlayback(AudioFile *audioFile)
             audioFile->sfInfo.samplerate,
             128,
             paCallback,
-            &cursor
+            audioFile
     );
     checkPaError(err);
 }
