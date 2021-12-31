@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include "ip/Audio.h"
 #include "ip/log.h"
 
@@ -105,4 +106,62 @@ void AudioPlayback::play() {
 
 void AudioPlayback::pause() {
     checkPaError(Pa_StopStream(stream));
+}
+
+// todo think about this
+
+AudioSync::AudioSync(const std::string& path)
+: audioPlaybackFile(path),
+audioVisualizerFile(path),
+audioPlayback(&audioPlaybackFile),
+kissFftrCfg(kiss_fftr_alloc(NFFT,0, nullptr, nullptr))
+{
+
+
+
+
+}
+
+
+AudioSync::~AudioSync() {
+    kiss_fftr_free(kissFftrCfg);
+}
+
+// todo put some thought into what sound data and what to push to the gpu
+AudioData AudioSync::read(std::chrono::duration<long, std::ratio<1, 1000000000>> dt) {
+    AudioData data{};
+    auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(dt).count();
+    if (millisec < 1) return data;
+    auto framesPerBuffer  = millisec * audioVisualizerFile.sfInfo.samplerate / 1000;
+    audioVisualizerFile.position = audioPlaybackFile.position-framesPerBuffer;
+    long n = framesPerBuffer * audioVisualizerFile.sfInfo.channels;
+    if (n % 2 == 1) n++; // make sure we have an even number for the fft
+    audioBuffer.reserve(n);
+    audioVisualizerFile.read(framesPerBuffer, audioBuffer.data());
+    for (int i = 0; i < NFFT; ++i) {
+        int sampleIndex = int(float(i)/float(NFFT)*float(n));
+        timedata[i] = audioBuffer[sampleIndex];
+    }
+    kiss_fftr(kissFftrCfg,timedata, fftOut);
+    float max = 0;
+    for(int i = 0; i < NFFT/2; ++i){
+         float v = sqrt(fftOut[i].r *fftOut[i].r + fftOut[i].i*fftOut[i].i);
+         if(v > max) max = v;
+         data.spectogram[i] = v;
+    }
+    for (float & i : data.spectogram) {
+        i /= 5;
+    }
+
+    float outputL = 0;
+    float outputR = 0;
+    for (int i = 0; i < n; i+=2) {
+        outputL += std::abs(audioBuffer[i]);
+        outputR += std::abs(audioBuffer[i+1]);
+    }
+    outputL /= float(framesPerBuffer);
+    outputR /= float(framesPerBuffer);
+    data.rightTotal = outputR;
+    data.leftTotal = outputL;
+    return data;
 }

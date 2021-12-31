@@ -5,8 +5,7 @@ using namespace std::chrono;
 #define tmpPath "/home/user/Music/2 Mello - Sounds Of Tokyo-To Future/2 Mello - Sounds Of Tokyo-To Future - 14 Chainsaw Funk.ogg"
 
 Display::Display()
-: audioVisualizationFile(audioPath), audioPlaybackFile(audioPath), audioPlayback(&audioPlaybackFile),
-  window(Window()), scene(&audioVisualizationFile, &audioPlaybackFile)
+: audioSync(audioPath), window(Window()), scene(&audioSync)
 {
     // graphic setup
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -19,7 +18,7 @@ Display::Display()
     scene.setResolution(width/2,height/2);
 
     currentTime = std::chrono::system_clock::now();
-    audioPlayback.play();
+    audioSync.audioPlayback.play();
 }
 
 Display::~Display() {

@@ -17,6 +17,9 @@
 #define SURFACE_DIST 0.001
 #define MAX_DIST 100 // avoid stepping into infinity
 #define PI 3.1415926538
+#define HSIZE 32
+#define HSIZEF 32.0
+// todo histogram name
 
 out vec4 color;
 uniform usamplerBuffer tapeSampler;
@@ -26,6 +29,7 @@ uniform uint ramSize;
 uniform vec2 iResolution;
 uniform float pulseL;
 uniform float pulseR;
+uniform float histogram[HSIZE];
 
 float ram[2^8];
 
@@ -128,13 +132,25 @@ float sceneDistance(in vec3 p){
     float boxLS = sphereDistance(p,vec3(-5,2,8),1+min(pulseL,1));
     boxL = smoothSubtraction(boxLS, boxL, 0.25);
     float boxR = sceneDistanceCuboid(p,vec3(5,2,10),vec3(2,4,2));
-    float boxRS = sphereDistance(p,vec3(5,2,8),1+pulseR);
+    float boxRS = sphereDistance(p,vec3(5,2,8),1+min(pulseR,1));
     boxR = smoothSubtraction(boxRS, boxR, 0.25);
     float d = min(boxL,boxR);
-    float connectorb = capsuleDistance(p,vec3(-2,2.1,11),vec3(3,2,11.2),0+min(pulseR,1));
-    float connectort = capsuleDistance(p,vec3(-3,4,11),vec3(3,4.1,10.8),0+min(pulseR,1));
-    d = smoothUnion(connectorb,d,2.5);
+    float connectorb = capsuleDistance(p,vec3(-3,2,11),vec3(3,5,11),-0.1+0.2*min(pulseL,1));
+    float connectort = capsuleDistance(p,vec3(-3,5,11),vec3(3,2,11),-0.1+0.2*min(pulseR,1));
+    d = smoothUnion(connectorb,d,1.3);
     d = smoothUnion(connectort,d,1.3);
+    // todo some artifacts
+    // using branching
+    // todo can we do that better? can we actually use multiple graph from the complex values
+    if(p.x < 5 && p.x > -5 && p.y < 5 && p.y > 0 && p.z > 10 && p.z < 14){
+        for(int i=0; i < HSIZE; i++){
+            float v = min(histogram[i],4);
+            vec3 pos = vec3((i/HSIZEF-0.5)*5.8,v/2.0,11);
+            vec3 size = vec3(1/HSIZEF,v,0.1);
+            float box = sceneDistanceCuboid(p,pos, size);
+            d = min(d,box);
+        }
+    }
     return min(d,p.y);
 }
 

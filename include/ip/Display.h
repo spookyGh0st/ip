@@ -8,9 +8,7 @@
 #include "Audio.h"
 
 class Display {
-    AudioFile audioVisualizationFile;
-    AudioFile audioPlaybackFile;
-    AudioPlayback audioPlayback;
+    AudioSync audioSync;
     Window window;
     ip::Scene scene;
 

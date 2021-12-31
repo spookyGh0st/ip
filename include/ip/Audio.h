@@ -6,6 +6,8 @@
 #include <sndfile.h>
 #include <portaudio.h>
 #include <memory>
+#include <vector>
+#include "kissfft/kiss_fftr.h"
 
 static int paCallback(
         const void *inputBuffer,
@@ -38,6 +40,30 @@ public:
 private:
     PaStream *stream{};
     AudioFile *audioFile ;
+};
+
+#define NFFT 64
+
+struct AudioData{
+    float leftTotal;
+    float rightTotal;
+    float spectogram[NFFT/2];
+};
+
+class AudioSync {
+public:
+    explicit AudioSync(const std::string& path);
+    ~AudioSync();
+    AudioFile audioPlaybackFile;
+    AudioFile audioVisualizerFile;
+    AudioPlayback audioPlayback;
+    kiss_fftr_cfg kissFftrCfg;
+    AudioData read(std::chrono::duration<long, std::ratio<1,1000000000>> dt);
+private:
+    std::vector<float> audioBuffer {};
+    float timedata[NFFT];
+
+    kiss_fft_cpx fftOut[NFFT];
 };
 
 

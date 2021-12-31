@@ -1,17 +1,15 @@
 #include <filesystem>
 #include <glad/glad.h>
 #include <ip/Tape.h>
-#include <cassert>
 #include "ip/Scene.h"
 
 using namespace ip;
 
-Scene::Scene(AudioFile *audioVisualization, AudioFile *audioPlayBackCur) :
+Scene::Scene(AudioSync *audioSync) :
         shader(ShaderProgram( std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/vert.glsl"), std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/frag.glsl"))),
         quad(Quad()),
         tape(createTapeFromExprString("min(min(y,sqrt(x*x+(y-1)*(y-1)+(z-6)*(z-6))-1),4)")),
-        audioVisualizationFile(audioVisualization),
-        audioPlaybackFile(audioPlayBackCur)
+        audioS(audioSync)
 {
     shader.use();
     shader.bindTapeBuffer("tapeSampler", (uint8_t *) (tape.instructions.data()), "tapeSize", tape.instructions.size(), 0);
@@ -22,23 +20,12 @@ Scene::~Scene() = default;
 
 // todo better sync, fix delay, maybe predict or what?
 void Scene::update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {
-    auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(dt).count();
-    if (millisec > 1){
-        auto framesPerBuffer  = millisec * audioVisualizationFile->sfInfo.samplerate / 1000;
-        audioVisualizationFile->position = audioPlaybackFile->position-framesPerBuffer;
-        long n = framesPerBuffer * audioVisualizationFile->sfInfo.channels;
-        audioBuffer.reserve(n);
-        audioVisualizationFile->read(framesPerBuffer, audioBuffer.data());
-        float outputL = 0;
-        float outputR = 0;
-        for (int i = 0; i < n; i+=2) {
-            outputL += std::abs(audioBuffer[i]);
-            outputR += std::abs(audioBuffer[i+1]);
-        }
-        outputL /= float(framesPerBuffer);
-        outputR /= float(framesPerBuffer);
-        shader.bindFloat(keyPulseL,outputL);
-        shader.bindFloat(keyPulseR,outputR);
+    auto ad = audioS->read(dt);
+    shader.bindFloat(keyPulseL,ad.leftTotal);
+    shader.bindFloat(keyPulseR,ad.rightTotal);
+    for (int i = 0; i < NFFT/2; ++i) {
+        auto name = "histogram["+ std::to_string(i)+"]";
+        shader.bindFloat(name,ad.spectogram[i]);
     }
 }
 

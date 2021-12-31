@@ -24,13 +24,11 @@ namespace ip{
         ShaderProgram shader;
         Quad quad;
         Tape tape;
-        AudioFile *audioVisualizationFile;
-        AudioFile *audioPlaybackFile;
-        std::vector<float> audioBuffer {};
+        AudioSync *audioS;
         std::string keyPulseL = "pulseL";
         std::string keyPulseR = "pulseR";
     public:
-        Scene(AudioFile *audioVisualization, AudioFile *audioPlaybackCursor);
+        Scene(AudioSync *audioS);
         ~Scene();
         void update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
         void render(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
