@@ -96,9 +96,9 @@ float smoothUnion(float d1, float d2, float k)
 }
 
 
-float sceneDistanceCuboid(in vec3 p, in vec3 center, in vec3 size){
-    float distance = length(max(abs(p-center)-size,0));
-    return distance;
+float sceneDistanceCuboid(in vec3 p, in vec3 center, in vec3 size, float r){
+    vec3 q = abs(p-center) - size;
+    return length(max(q,0.0))+min(max(q.x,max(q.y,q.z)),0.0)-r;
 }
 
 float capsuleDistance(in vec3 p, in vec3 startSphere, in vec3 endSphere, float radius){
@@ -128,10 +128,10 @@ float sceneDistance(in vec3 p){
     // float planet = sphereDistance(p,vec3(-50,0,60),10*(1+pulseL));
     // float rocket = sceneDistanceCapsule(p,vec3(-40*(1-pulseL),3,40),vec3(-35*(1-pulseR),5,40),0.5);
     // float sun = sphereDistance(p,vec3(30,0,60),30*(1+pulseR));
-    float boxL = sceneDistanceCuboid(p,vec3(-5,2,10),vec3(2,4,2));
+    float boxL = sceneDistanceCuboid(p,vec3(-5,2,10),vec3(2,4,2),0.2);
     float boxLS = sphereDistance(p,vec3(-5,2,8),1+min(pulseL,1));
     boxL = smoothSubtraction(boxLS, boxL, 0.25);
-    float boxR = sceneDistanceCuboid(p,vec3(5,2,10),vec3(2,4,2));
+    float boxR = sceneDistanceCuboid(p,vec3(5,2,10),vec3(2,4,2),0.2);
     float boxRS = sphereDistance(p,vec3(5,2,8),1+min(pulseR,1));
     boxR = smoothSubtraction(boxRS, boxR, 0.25);
     float d = min(boxL,boxR);
@@ -147,7 +147,7 @@ float sceneDistance(in vec3 p){
             float v = min(histogram[i],4);
             vec3 pos = vec3((i/HSIZEF-0.5)*5.8,v/2.0,11);
             vec3 size = vec3(1/HSIZEF,v,0.1);
-            float box = sceneDistanceCuboid(p,pos, size);
+            float box = sceneDistanceCuboid(p,pos, size,0);
             d = min(d,box);
         }
     }

@@ -1,0 +1,26 @@
+Bau eines Graph, Tape
+https://www.mattkeeter.com/research/mpr/
+
+zu komplex fuer erste iteration.
+Performance aufgrund fehlender Interval evaluation und Tape shortening nicht verwendbar, daher, back to the basic:
+Rein in GLSL definierte raymarching Distance Functions:
+https://www.iquilezles.org/www/articles/raymarchingdf/raymarchingdf.htm
+
+https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
+smoothmax, smooth min and every Distance function:
+
+
+
+## Audio
+
+How Audio works in the
+https://www.youtube.com/watch?v=UvRU25T_XOg
+
+Relearning imaginary Numbers
+https://www.welchlabs.com/resources/freebook
+
+Fourier Analysis
+https://www.youtube.com/watch?v=jNC0jxb0OxE&list=PLMrJAkhIeNNT_Xh3Oy0Y4LTj0Oxo8GqsC
+http://databookuw.com
+
+
