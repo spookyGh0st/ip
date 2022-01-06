@@ -11,19 +11,21 @@
 class Window {
 private:
     GLFWwindow *glfwWindow;
-    float xPos{}, yPos{}, width{}, height{};
+    float xPos{}, yPos{};
+
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 public:
     Window();
     Window(const Window&) = delete;
     Window(Window&& other) noexcept;
 
-    void setPosition(float x, float y);
-    void setSize(float width, float height);
     int shouldClose();
     void processInput();
     void swapBuffers();
     virtual ~Window();
+
+    float height{};
+    float width{};
 };
 
 #endif //IP_WINDOW_H

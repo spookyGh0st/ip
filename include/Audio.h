@@ -7,6 +7,7 @@
 #include <portaudio.h>
 #include <memory>
 #include <vector>
+#include <chrono>
 #include "kissfft/kiss_fftr.h"
 
 static int paCallback(
@@ -58,7 +59,7 @@ public:
     AudioFile audioVisualizerFile;
     AudioPlayback audioPlayback;
     kiss_fftr_cfg kissFftrCfg;
-    AudioData read(std::chrono::duration<long, std::ratio<1,1000000000>> dt);
+    AudioData read(float dt);
 private:
     std::vector<float> audioBuffer {};
     float timedata[NFFT];

@@ -22,11 +22,11 @@ namespace ip{
     public:
         Scene(AudioSync *audioS);
         ~Scene();
-        void update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
-        void render(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t);
+        void update(float dt, float t);
+        void render(float dt, float t);
         void onKey(int key, int scancode, int action, int mode);
 
-        void setResolution(int width, int height);
+        void setResolution(float width, float height);
     };
 }
 

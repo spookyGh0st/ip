@@ -61,7 +61,19 @@ Window::Window() {
     glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
-    glfwWindow = glfwCreateWindow(800, 600, "LearnOpenGL", nullptr, nullptr);
+    int count, monitor_x, monitor_y;
+    GLFWmonitor** ml = glfwGetMonitors(&count);
+    GLFWmonitor* m = ml[count-1];
+    const char **desc = nullptr;
+    glfwGetError(desc);
+    std::cout << desc << std::endl;
+    glfwGetMonitorPos(m,&monitor_x, &monitor_y);
+    const GLFWvidmode *mode = glfwGetVideoMode(m);
+    width = float(mode->width);
+    height = float(mode->height);
+
+    glfwWindow = glfwCreateWindow(mode->width, mode->height, "Mariana", nullptr, nullptr);
+    glfwSetWindowPos(glfwWindow,monitor_x,monitor_y);
     if (glfwWindow == nullptr)
     {
         glfwTerminate();
@@ -74,7 +86,6 @@ Window::Window() {
         throw std::runtime_error("Failed to initialize GLAD");
     }
 
-    glfwMakeContextCurrent(glfwWindow);
     glfwSetFramebufferSizeCallback(glfwWindow, framebuffer_size_callback);
 
     //DEBUT OUTPUT
@@ -112,17 +123,6 @@ void Window::processInput() {
         glfwSetWindowShouldClose(glfwWindow, true);
 }
 
-void Window::setPosition(float x, float y) {
-    xPos = x; yPos = y;
-    glfwSetWindowPos(glfwWindow, int(xPos-width/2),int(yPos-height/2));
-    glfwSetWindowSize(glfwWindow,int(width),int(height));
-    glViewport(0, 0, int(width), int(height));
-}
-
-void Window::setSize(float windowWidth, float windowHeight) {
-    this->width = windowWidth;
-    this->height = windowHeight;
-}
 
 void Window::swapBuffers() {
     glfwSwapBuffers(glfwWindow);

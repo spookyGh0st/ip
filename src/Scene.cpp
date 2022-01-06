@@ -19,7 +19,7 @@ Scene::Scene(AudioSync *audioSync) :
 Scene::~Scene() = default;
 
 // todo better sync, fix delay, maybe predict or what?
-void Scene::update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {
+void Scene::update(float dt, float t) {
     auto ad = audioS->read(dt);
     shader.bindFloat(keyPulseL,ad.leftTotal);
     shader.bindFloat(keyPulseR,ad.rightTotal);
@@ -29,15 +29,15 @@ void Scene::update(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, st
     }
 }
 
-void Scene::render(std::chrono::duration<long, std::ratio<1, 1000000000>> dt, std::chrono::time_point<std::chrono::system_clock> t) {
+void Scene::render(float dt, float t) {
     shader.use();
     quad.render();
 }
 
-void Scene::setResolution(int width, int height) {
+void Scene::setResolution(float width, float height) {
     shader.use();
     std::string keyResolution { "iResolution" };
-    shader.bindVec2(keyResolution, float(width), float(height));
+    shader.bindVec2(keyResolution, width, height);
 }
 
 void Scene::onKey(int key, int scancode, int action, int mode) {

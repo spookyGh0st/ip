@@ -128,9 +128,9 @@ AudioSync::~AudioSync() {
 }
 
 // todo put some thought into what sound data and what to push to the gpu
-AudioData AudioSync::read(std::chrono::duration<long, std::ratio<1, 1000000000>> dt) {
+AudioData AudioSync::read(float dt) {
     AudioData data{};
-    auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(dt).count();
+    auto millisec = int(dt * 1000);
     if (millisec < 1) return data;
     auto framesPerBuffer  = millisec * audioVisualizerFile.sfInfo.samplerate / 1000;
     audioVisualizerFile.position = audioPlaybackFile.position-framesPerBuffer;

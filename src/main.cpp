@@ -1,73 +1,35 @@
-#include "Display.h"
 #include "test.h"
 #include "Audio.h"
+#include "Window.h"
+#include "Scene.h"
+#include "Timer.h"
 
-
-#define N 16
-void TestFftReal(const char* title, const kiss_fft_scalar in[N], kiss_fft_cpx out[N / 2 + 1])
-{
-    kiss_fftr_cfg cfg;
-
-    printf("%s\n", title);
-
-    if ((cfg = kiss_fftr_alloc(N, 0/*is_inverse_fft*/, NULL, NULL)) != NULL)
-    {
-        size_t i;
-
-        kiss_fftr(cfg, in, out);
-        free(cfg);
-
-        for (i = 0; i < N; i++)
-        {
-            printf(" in[%2zu] = %+f    ",
-                   i, in[i]);
-            if (i < N / 2 + 1){
-                float k = 2;
-                float v = out[i].r * (cos(i*k) + out[i].i*sin(i*k));
-                printf("out[%2zu] = %+f ", i, v);
-            }
-            printf("\n");
-        }
-    }
-    else
-    {
-        printf("not enough memory?\n");
-        exit(-1);
-    }
-}
-
-// int main(void)
-// {
-//     kiss_fft_scalar in[N];
-//     kiss_fft_cpx out[N / 2 + 1];
-//     size_t i;
-//
-//     for (i = 0; i < N; i++)
-//         in[i] = 0;
-//     TestFftReal("Zeroes (real)", in, out);
-//
-//     for (i = 0; i < N; i++)
-//         in[i] = 1;
-//     TestFftReal("Ones (real)", in, out);
-//
-//     for (i = 0; i < N; i++)
-//         in[i] = sin(2 * M_PI * 4 * i / N);
-//     TestFftReal("SineWave (real)", in, out);
-//
-//     return 0;
-// }
+#define audioPath "/home/user/Music/2 Mello - Sounds Of Tokyo-To Future/2 Mello - Sounds Of Tokyo-To Future - 13 Poison Jam (Part II).ogg"
 
 int main() {
 
-    auto start = std::chrono::steady_clock::now();
+    auto start = std::chrono::system_clock::now();
+    Timer t {};
     glfwInit();
 
-    auto display = Display();
-    auto startupTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start).count();
-    std::cout << "Startup complete in " << startupTime << "milliseconds" << std::endl;
+    AudioSync sync { audioPath };
+    Window window { };
+    ip::Scene scene { &sync };
+    scene.setResolution(window.width,window.height);
 
-    while(!display.shouldClose()) {
-        display.update();
+    logInfo("Startup complete in " + std::to_string(t.startUpTime()) + "milliseconds");
+
+    sync.audioPlayback.play();
+
+    while(!window.shouldClose()) {
+        t.advanceFrame();
+        window.processInput();
+        scene.update(t.dt, t.t);
+        glClearColor(0.0f,1.0f,0.0f,1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        scene.render(t.dt,t.t);
+        glfwPollEvents();
+        window.swapBuffers();
     }
 
     return 0;
