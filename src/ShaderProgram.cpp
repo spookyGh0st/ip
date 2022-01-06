@@ -3,6 +3,7 @@
 #include "glad.h"
 #include <fstream>
 #include "ShaderProgram.h"
+#include <glm/gtc/type_ptr.hpp>
 
 ShaderProgram::~ShaderProgram(){
     if (programID != 0){
@@ -134,5 +135,20 @@ void ShaderProgram::bindUnsignedInt(std::string &name, unsigned int value) const
 void ShaderProgram::bindVec2(std::string &name, float width, float height) const {
     auto location { glGetUniformLocation(programID, name.c_str()) };
     glUniform2f(location, width, height);
+}
+
+void ShaderProgram::bindVec3(const char *name, glm::vec3 value) const {
+    auto location { glGetUniformLocation(programID, name) };
+    glUniform3f(location, value.x,value.y,value.z);
+}
+
+void ShaderProgram::bindVec4(const char *name, glm::vec4 value) const {
+    auto location { glGetUniformLocation(programID, name) };
+    glUniform4f(location, value.x,value.y,value.z,value.w);
+}
+
+void ShaderProgram::bindMat4(const char *name, glm::mat4 value) const {
+    auto location { glGetUniformLocation(programID, name) };
+    glUniformMatrix4fv(location, 1,GL_FALSE,glm::value_ptr(value));
 }
 

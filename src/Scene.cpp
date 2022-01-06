@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <glm/detail/type_mat4x2.hpp>
 #include "glad.h"
 #include "Tape.h"
 #include "Scene.h"
@@ -20,6 +21,10 @@ Scene::~Scene() = default;
 
 // todo better sync, fix delay, maybe predict or what?
 void Scene::update(float dt, float t) {
+    camera.update(dt,t);
+    shader.bindMat4("view", camera.getViewMatrix());
+    shader.bindVec3("cameraPos", camera.position);
+
     auto ad = audioS->read(dt);
     shader.bindFloat(keyPulseL,ad.leftTotal);
     shader.bindFloat(keyPulseR,ad.rightTotal);

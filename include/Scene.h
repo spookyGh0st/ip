@@ -8,9 +8,9 @@
 #include "Tape.h"
 #include "Audio.h"
 #include "Quad.h"
+#include "Camera.h"
 
 namespace ip{
-
     class Scene {
     private:
         ShaderProgram shader;
@@ -19,8 +19,9 @@ namespace ip{
         AudioSync *audioS;
         std::string keyPulseL = "pulseL";
         std::string keyPulseR = "pulseR";
+        Camera camera {};
     public:
-        Scene(AudioSync *audioS);
+        explicit Scene(AudioSync *audioS);
         ~Scene();
         void update(float dt, float t);
         void render(float dt, float t);

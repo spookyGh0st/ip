@@ -5,6 +5,9 @@
 
 #include <filesystem>
 #include <vector>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 #include "log.h"
 
 class ShaderProgram {
@@ -28,6 +31,9 @@ public:
     void bindTapeBuffer(std::string name, uint8_t value[], std::string sizeName, unsigned int size, int count) const;
     void bindRamBuffer(std::string name, float value[], std::string sizeName, unsigned int size, int count) const;
     void bindVec2(std::string &name, float width, float height) const;
+    void bindVec3(const char *name, glm::vec3) const;
+    void bindVec4(const char *name, glm::vec4) const;
+    void bindMat4(const char *name, glm::mat4) const;
 };
 
 

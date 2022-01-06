@@ -31,6 +31,10 @@ uniform float pulseL;
 uniform float pulseR;
 uniform float histogram[HSIZE];
 
+
+uniform vec3 cameraPos;
+uniform mat4 view;
+
 float ram[2^8];
 
 void emulateClause(in uvec4 clause, in vec3 p) {
@@ -195,11 +199,11 @@ vec3 getLight(in vec3 p) {
 void main()
 {
     vec2 normFragPos = (gl_FragCoord.xy-0.5*iResolution)/iResolution.y;
-    vec3 rayOrigin = vec3(0,0.2,0);
-    vec3 rayDirection = normalize(vec3(normFragPos.x,normFragPos.y+0.3,1));
-    float dist = march(rayOrigin,rayDirection);
+    vec4 rd = view * vec4(normFragPos.x,normFragPos.y+0.0,1,0);
+    vec3 rayDirection = normalize(rd.xyz);
+    float dist = march(cameraPos,rayDirection);
 
-    vec3 position = rayOrigin + rayDirection*dist;
+    vec3 position = cameraPos + rayDirection*dist;
     vec3 diffuse = getLight(position);
     color = vec4(diffuse,1);
 }
