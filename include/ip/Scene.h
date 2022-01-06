@@ -7,17 +7,9 @@
 #include "Syntax.h"
 #include "Tape.h"
 #include "Audio.h"
+#include "Quad.h"
 
 namespace ip{
-    class Quad {
-    private:
-        unsigned  int quad_vao{};
-        unsigned  int quad_vbo{};
-    public:
-        Quad();
-        ~Quad();
-        void render() const;
-    };
 
     class Scene {
     private:

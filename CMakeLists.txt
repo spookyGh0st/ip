@@ -10,6 +10,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 add_executable(ip src/main.cpp src/glad.c
         src/Window.cpp include/ip/Window.h
         include/ip/Clause.h src/Clause.cpp
+        include/ip/Quad.h src/Quad.cpp
         include/ip/Syntax.h src/Syntax.cpp
         include/ip/ShaderProgram.h src/ShaderProgram.cpp
         src/Scanner.cpp include/ip/Scanner.h
