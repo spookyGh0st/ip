@@ -1,8 +1,8 @@
 
 
-#include <glad/glad.h>
+#include "glad.h"
 #include <fstream>
-#include "ip/ShaderProgram.h"
+#include "ShaderProgram.h"
 
 ShaderProgram::~ShaderProgram(){
     if (programID != 0){

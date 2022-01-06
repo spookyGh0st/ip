@@ -1,4 +1,4 @@
-#include "ip/Display.h"
+#include "Display.h"
 
 using namespace std::chrono;
 #define audioPath "/home/user/Music/2 Mello - Sounds Of Tokyo-To Future/2 Mello - Sounds Of Tokyo-To Future - 13 Poison Jam (Part II).ogg"

@@ -1,10 +1,10 @@
 
 
-#include "ip/Scene.h"
-#include <ip/Tape.h>
-#include <glad/glad.h>
+#include "Scene.h"
+#include "Tape.h"
+#include "glad.h"
 #include <filesystem>
-#include "ip/Quad.h"
+#include "Quad.h"
 
 Quad::Quad() {
     glGenVertexArrays(1, &quad_vao);

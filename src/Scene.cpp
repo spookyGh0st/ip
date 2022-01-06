@@ -1,7 +1,7 @@
 #include <filesystem>
-#include <glad/glad.h>
-#include <ip/Tape.h>
-#include "ip/Scene.h"
+#include "glad.h"
+#include "Tape.h"
+#include "Scene.h"
 
 using namespace ip;
 

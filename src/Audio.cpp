@@ -1,7 +1,7 @@
 #include <iostream>
 #include <chrono>
-#include "ip/Audio.h"
-#include "ip/log.h"
+#include "Audio.h"
+#include "log.h"
 
 /* This routine will be called by the PortAudio engine when audioPlayback is needed.
  * It may called at interrupt level on some machines so don't do anything

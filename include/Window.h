@@ -1,13 +1,12 @@
 #ifndef IP_WINDOW_H
 #define IP_WINDOW_H
 
-#include "glad/glad.h"
+#include "glad.h"
 #include "GLFW/glfw3.h"
 #include "Scene.h"
 
 #define GLFW_MAJOR_VERSION 4
 #define GLFW_MINOR_VERSION 6
-#include <glm/glm/ext/matrix_float4x4.hpp>
 
 class Window {
 private:
@@ -18,7 +17,6 @@ public:
     Window();
     Window(const Window&) = delete;
     Window(Window&& other) noexcept;
-    glm::mat4 mm { glm::mat4() };
 
     void setPosition(float x, float y);
     void setSize(float width, float height);

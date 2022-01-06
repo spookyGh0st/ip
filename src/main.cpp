@@ -1,6 +1,6 @@
-#include "ip/Display.h"
-#include "ip/test.h"
-#include "ip/Audio.h"
+#include "Display.h"
+#include "test.h"
+#include "Audio.h"
 
 
 #define N 16

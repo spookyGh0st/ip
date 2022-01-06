@@ -1,5 +1,5 @@
 #include <iostream>
-#include <ip/Window.h>
+#include "Window.h"
 
 void Window::framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);

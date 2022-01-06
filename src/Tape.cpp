@@ -1,5 +1,5 @@
-#include "ip/Tape.h"
-#include "ip/Clause.h"
+#include "Tape.h"
+#include "Clause.h"
 
 TapeGenerator::TapeGenerator(std::unique_ptr<Expr> &&e):
     expr(std::move(e)) {
@@ -73,7 +73,7 @@ void TapeEmulator::emulateClause(Clause &clause) {
     }
 }
 
-#include <glad/glad.h>
+#include "glad.h"
 
 Tape createTapeFromExprString(std::string &&exprStr) {
     auto expr = ip::Parser(exprStr).parse();

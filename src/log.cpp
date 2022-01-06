@@ -1,4 +1,4 @@
-#include "ip/log.h"
+#include "log.h"
 
 void logInfo(std::string &message) {
     log(INFO, message);
