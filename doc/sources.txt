@@ -9,6 +9,11 @@ https://www.iquilezles.org/www/articles/raymarchingdf/raymarchingdf.htm
 https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 smoothmax, smooth min and every Distance function:
 
+presentation with real cool shit
+https://www.dropbox.com/s/s9tzmyj0wqkymmz/Claybook_Simulation_Raytracing_GDC18.pptx?dl=0
+
+soft shadows
+https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm
 
 
 ## Audio

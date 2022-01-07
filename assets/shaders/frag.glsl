@@ -15,7 +15,7 @@
 
 #define MAX_STEPS 10000
 #define SURFACE_DIST 0.001
-#define MAX_DIST 100 // avoid stepping into infinity
+#define MAX_DIST 1000 // avoid stepping into infinity
 #define PI 3.1415926538
 #define HSIZE 32
 #define HSIZEF 32.0
@@ -132,10 +132,10 @@ float sceneDistance(in vec3 p){
     // float planet = sphereDistance(p,vec3(-50,0,60),10*(1+pulseL));
     // float rocket = sceneDistanceCapsule(p,vec3(-40*(1-pulseL),3,40),vec3(-35*(1-pulseR),5,40),0.5);
     // float sun = sphereDistance(p,vec3(30,0,60),30*(1+pulseR));
-    float boxL = sceneDistanceCuboid(p,vec3(-5,2,10),vec3(2,4,2),0.2);
+    float boxL = sceneDistanceCuboid(p,vec3(-5,1.9,10),vec3(2,4.2,2),0.2);
     float boxLS = sphereDistance(p,vec3(-5,2,8),1+min(pulseL,1));
     boxL = smoothSubtraction(boxLS, boxL, 0.25);
-    float boxR = sceneDistanceCuboid(p,vec3(5,2,10),vec3(2,4,2),0.2);
+    float boxR = sceneDistanceCuboid(p,vec3(5,1.9,10),vec3(2,4.2,2),0.2);
     float boxRS = sphereDistance(p,vec3(5,2,8),1+min(pulseR,1));
     boxR = smoothSubtraction(boxRS, boxR, 0.25);
     float d = min(boxL,boxR);
@@ -181,17 +181,41 @@ float march(vec3 rayOrigin, vec3 rayDirection) {
     return originDistance;
 }
 
+float ambientOcclusion(in vec3 p, vec3 n, float stepDistance, float stepNumber){
+    float occlusion = 1.0f;
+    while (stepNumber > 0.0){
+        float dist = sceneDistance(p+n*stepNumber*stepDistance);
+        occlusion -= pow(stepNumber * stepDistance - dist,2) / stepNumber;
+        stepNumber--;
+    }
+    return occlusion;
+}
+
+float softshadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k ) {
+    float res = 1.0;
+    for( float t=mint; t<maxt; )
+    {
+        float h = sceneDistance(ro + rd*t);
+        if( h<0.001 ) return 0.0;
+        res = min( res, k*h/t );
+        t += h;
+    }
+    return res;
+}
+
 vec3 getLight(in vec3 p) {
-    vec3 lightPos = vec3(0,5,-6);
+    vec3 lightPos = vec3(0,10,-6);
     vec3 l = normalize(lightPos-p);
     vec3 n = getNormal(p);
     // dot returns between -1 and 1, since both l and n are length 1
-    float diffuse = clamp(dot(n,l),0,1);
+    float s = softshadow(p+n*SURFACE_DIST*2,l,SURFACE_DIST,MAX_DIST,64);
+    float diffuse = clamp(dot(n,l),0,1) * s;
     // shadowing
-    float distance = march(p + n*SURFACE_DIST*2,l);
-    if (distance < length(lightPos-p)){ // in shadow
-        diffuse *= 0.1;
-    }
+    // float distance = march(p + n*SURFACE_DIST*2,l);
+    // if (distance < length(lightPos-p)){ // in shadow
+    //     diffuse *= 0.1;
+    // }
+    diffuse*=ambientOcclusion(p,n,0.25,5);
     vec3 color = vec3(min(0.2+pulseL +pulseR, 1)*diffuse);
     return color;
 }

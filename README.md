@@ -10,9 +10,10 @@ Bau eines Renderers auf Basis von implizierten Oberflaechen.
 - [x] Bau eines Tape generators?
 - [x] Rendering der Scene durch
     - [x] erste Iteration: Sphere Marching 
-    - [ ] ausbau des Sphere marching mit lichtmodel
+    - [x] ausbau des Sphere marching mit lichtmodel
 - [x] Point light Shading
-- [ ] Ambient Occlusion
+- [x] Ambient Occlusion
+- [x] soft shadows
 - [ ] coloring/texturing?
 - [ ] Doc schreiben
 
@@ -29,3 +30,5 @@ As always, the more you learn the more you realise you don't know.
 Here is a collection of things I discovered but put aside for know
 - procedual isosurface
 - analytic surfaces
+- store distance function in volume texture, 
+- trilinear filter
