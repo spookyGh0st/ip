@@ -7,10 +7,10 @@
 
 class Timer {
 private:
-    using systemclock = std::chrono::system_clock;
-    using timepoint = std::chrono::time_point<systemclock>;
-    timepoint start = systemclock::now();
-    timepoint current = systemclock::now();
+    using clock = std::chrono::steady_clock;
+    using timepoint = std::chrono::time_point<clock>;
+    timepoint start = clock::now();
+    timepoint current = clock::now();
     unsigned long frames { 0 };
     unsigned long fpsTime { 0 };
 public:
