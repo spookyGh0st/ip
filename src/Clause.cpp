@@ -1,4 +1,4 @@
-#include "ip/Clause.h"
+#include "Clause.h"
 
 Clause::Clause(Opcode opcode, uint8_t output, uint8_t inputA, uint8_t inputB)
     : opcode(opcode), output(output), input_A(inputA), input_B(inputB) {}

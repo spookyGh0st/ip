@@ -6,20 +6,21 @@ project(
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_COMPILER "clang++")
-add_executable(ip src/main.cpp src/glad.c
-        src/Window.cpp include/ip/Window.h
-        include/ip/Clause.h src/Clause.cpp
-        include/ip/Syntax.h src/Syntax.cpp
-        include/ip/ShaderProgram.h src/ShaderProgram.cpp
-        src/Scanner.cpp include/ip/Scanner.h
-        src/GeometricalObject.cpp include/ip/GeometricalObject.h
-        src/Parser.cpp include/ip/Parser.hpp src/Display.cpp include/ip/Display.h src/Tape.cpp include/ip/Tape.h src/Scene.cpp include/ip/Scene.h src/ShaderProgram.cpp include/ip/ShaderProgram.h
-        include/ip/log.h src/log.cpp
-        src/test.cpp include/ip/test.h)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
+file(GLOB_RECURSE sources CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB_RECURSE c_sources CONFIGURE_DEPENDS "src/*.c")
+file(GLOB_RECURSE headers CONFIGURE_DEPENDS "include/*.h")
+
+add_executable(ip ${sources} ${c_sources} ${headers})
 
 find_package(glfw3 3.3 REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(kissfft REQUIRED)
+find_package(glm REQUIRED)
+find_library(portaudio portaudio REQUIRED)
+find_library(sndfile sndfile REQUIRED)
 
 target_include_directories(ip PRIVATE include)
-target_link_libraries(ip PUBLIC glfw OpenGL::GL ${CMAKE_DL_LIBS})
+target_link_libraries(ip PUBLIC kissfft-float glfw OpenGL::GL glm::glm portaudio sndfile ${CMAKE_DL_LIBS})
+target_compile_options(ip PRIVATE -Wall -Wextra)
