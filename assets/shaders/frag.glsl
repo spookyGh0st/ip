@@ -31,6 +31,8 @@ uniform float pulseL;
 uniform float pulseR;
 uniform float histogram[HSIZE];
 
+uniform sampler2D woodTexture;
+uniform sampler2D duckTexture;
 
 uniform vec3 cameraPos;
 uniform mat4 view;
@@ -203,10 +205,9 @@ float softshadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k ) {
     return res;
 }
 
-vec3 getLight(in vec3 p) {
+float getLight(in vec3 p, in vec3 n) {
     vec3 lightPos = vec3(0,10,-6);
     vec3 l = normalize(lightPos-p);
-    vec3 n = getNormal(p);
     // dot returns between -1 and 1, since both l and n are length 1
     float s = softshadow(p+n*SURFACE_DIST*2,l,SURFACE_DIST,MAX_DIST,64);
     float diffuse = clamp(dot(n,l),0,1) * s;
@@ -216,8 +217,30 @@ vec3 getLight(in vec3 p) {
     //     diffuse *= 0.1;
     // }
     diffuse*=ambientOcclusion(p,n,0.25,5);
-    vec3 color = vec3(min(0.2+pulseL +pulseR, 1)*diffuse);
-    return color;
+    diffuse*=clamp(0.0,1,0.6+(pulseR+pulseR)*0.5);
+    return diffuse;
+}
+
+vec3 getColor(in vec3 p, vec3 n){
+    vec3 col = vec3(0.1);
+    vec3 colorXZ = texture(woodTexture, p.xz*0.5+0.5).rgb;
+    vec3 colorYZ = texture(woodTexture, p.zy*0.5+0.5).rgb;
+    vec3 colorXY = texture(woodTexture, p.xy*0.5+0.5).rgb;
+    vec3 absN = abs(n);
+    vec3 mixedSides = colorXZ * absN.y +colorYZ * absN.x + colorXY * absN.z;
+    vec4 wood = vec4(mixedSides, smoothstep(0.0,0.05, p.y));
+    col = mix(col,wood.rgb,wood.a);
+
+    vec4 duck = texture(duckTexture,-abs(p.xy)*0.4+0.5);
+    float duckStrength = clamp(0,1,0.2+(pulseL+pulseR));
+    duck = vec4(mix(duck.rgb,vec3(1),duckStrength),duck.a);
+    float duckSlider = smoothstep(3.7,3.75,p.y) * smoothstep(6.1,6.0,p.y);;
+    float strengthRight = smoothstep(3.5,3.6,p.x)*smoothstep(6.1,6.0,p.x);
+    float strengthLeft = smoothstep(-3.8,-3.9,p.x)*smoothstep(-6.1,-6.0,p.x);
+    duckSlider *= max(strengthLeft,strengthRight);
+    col = mix(col, duck.rgb,duck.a*duckSlider);
+
+    return col;
 }
 
 void main()
@@ -228,11 +251,8 @@ void main()
     float dist = march(cameraPos,rayDirection);
 
     vec3 position = cameraPos + rayDirection*dist;
-    vec3 diffuse = getLight(position);
-    color = vec4(diffuse,1);
+    vec3 n = getNormal(position);
+    float diffuse = getLight(position,n);
+    color = vec4(getColor(position,n) * diffuse,1);
 }
 
-// Ableitung von gradient -> normale
-// pick surface distance as delta
-// display normals
-// bounding boxs

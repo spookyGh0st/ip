@@ -36,6 +36,8 @@ void Scene::update(float dt, float t) {
 
 void Scene::render(float dt, float t) {
     shader.use();
+    woodTexture.bind(shader);
+    duckTexture.bind(shader);
     quad.render();
 }
 

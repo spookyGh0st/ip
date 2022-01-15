@@ -14,7 +14,7 @@ Bau eines Renderers auf Basis von implizierten Oberflaechen.
 - [x] Point light Shading
 - [x] Ambient Occlusion
 - [x] soft shadows
-- [ ] coloring/texturing?
+- [x] coloring/texturing?
 - [ ] Doc schreiben
 
 ## Bau
@@ -32,3 +32,8 @@ Here is a collection of things I discovered but put aside for know
 - analytic surfaces
 - store distance function in volume texture, 
 - trilinear filter
+
+# Credits
+
+Contains assets from ambientCG.com, licensed under CC0 1.0 Universal.
+

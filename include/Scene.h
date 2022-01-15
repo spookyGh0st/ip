@@ -9,6 +9,7 @@
 #include "Audio.h"
 #include "Quad.h"
 #include "Camera.h"
+#include "Texture.h"
 
 namespace ip{
     class Scene {
@@ -20,6 +21,8 @@ namespace ip{
         std::string keyPulseL = "pulseL";
         std::string keyPulseR = "pulseR";
         Camera camera {};
+        WoodTexture woodTexture {};
+        DuckTexture duckTexture {};
     public:
         explicit Scene(AudioSync *audioS);
         ~Scene();
