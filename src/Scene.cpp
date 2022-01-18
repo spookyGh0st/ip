@@ -8,7 +8,7 @@ using namespace ip;
 Scene::Scene(AudioSync *audioSync) :
         shader(ShaderProgram( std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/vert.glsl"), std::filesystem::path("/home/user/uni/sem7/ip/assets/shaders/frag.glsl"))),
         quad(Quad()),
-        tape(createTapeFromExprString("min(min(y,sqrt(x*x+(y-1)*(y-1)+(z-6)*(z-6))-1),4)")),
+        tape(createTapeFromExprString("min(y,sqrt(x*x+(y-1)*(y-1)+(z-6)*(z-6))-1)")),
         audioS(audioSync)
 {
     shader.use();

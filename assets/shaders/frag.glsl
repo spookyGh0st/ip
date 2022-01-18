@@ -13,9 +13,9 @@
 #define OPCODE_SQRT 11
 #define OPCODE_FLOAT 12
 
-#define MAX_STEPS 1000
+#define MAX_STEPS 100
 #define SURFACE_DIST 0.01
-#define MAX_DIST 100 // avoid stepping into infinity
+#define MAX_DIST 500 // avoid stepping into infinity
 #define PI 3.1415926538
 #define HSIZE 32
 #define HSIZEF 32.0
@@ -250,6 +250,7 @@ vec3 reflectCol(in vec3 p, in vec3 n, in vec3 originalRayDirection, in vec3 col)
     vec3 reflectStartingPoint = p + reflectedRayDirection * SURFACE_DIST*2.1;
     float reflectPosDistance = march(reflectStartingPoint, reflectedRayDirection);
     // don't reflect anything if the ray goes off into the void
+    // todo don't reflect far away
     if (reflectPosDistance > MAX_DIST) reflectStrength = 0;
     vec3 reflectionPosition = reflectStartingPoint+reflectedRayDirection*reflectPosDistance;
     vec3 reflectionColor = getColor(reflectionPosition,getNormal(reflectionPosition));
