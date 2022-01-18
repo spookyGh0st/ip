@@ -243,15 +243,17 @@ vec3 getColor(in vec3 p, vec3 n){
     return col;
 }
 
-vec3 reflectCol(in vec3 p, in vec3 n, in vec3 rayDirection, in vec3 col){
-    float reflectStrength = 0.8+0.2*smoothstep(0.0,0.1,p.y);
-    vec3 refDir = reflect(rayDirection, n);
-    vec3 reflectStartingPoint = p + refDir * 0.1;
-    float reflectPosDistance = march(reflectStartingPoint, refDir);
-    if (reflectPosDistance > MAX_DIST) reflectStrength = 1;
-    vec3 refPos = reflectStartingPoint+refDir*reflectPosDistance;
-    vec3 refColor = getColor(refPos,getNormal(refPos));
-    return mix(refColor, col,reflectStrength);
+vec3 reflectCol(in vec3 p, in vec3 n, in vec3 originalRayDirection, in vec3 col){
+    float reflectStrength = 0.2*smoothstep(0.1,0.0,p.y);
+    vec3 reflectedRayDirection = reflect(originalRayDirection, n);
+    // make sure we start with a bit of offset, to not hit against SURFACE_DIST again
+    vec3 reflectStartingPoint = p + reflectedRayDirection * SURFACE_DIST*2.1;
+    float reflectPosDistance = march(reflectStartingPoint, reflectedRayDirection);
+    // don't reflect anything if the ray goes off into the void
+    if (reflectPosDistance > MAX_DIST) reflectStrength = 0;
+    vec3 reflectionPosition = reflectStartingPoint+reflectedRayDirection*reflectPosDistance;
+    vec3 reflectionColor = getColor(reflectionPosition,getNormal(reflectionPosition));
+    return mix(col, reflectionColor,reflectStrength);
 }
 
 // constants
