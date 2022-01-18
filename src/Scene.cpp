@@ -14,6 +14,8 @@ Scene::Scene(AudioSync *audioSync) :
     shader.use();
     shader.bindTapeBuffer("tapeSampler", (uint8_t *) (tape.instructions.data()), "tapeSize", tape.instructions.size(), 0);
     shader.bindRamBuffer("ramSampler", tape.constants.data(), "ramSize", tape.constants.size(), 1);
+
+    glEnable(GL_FRAMEBUFFER_SRGB);
 }
 
 Scene::~Scene() = default;

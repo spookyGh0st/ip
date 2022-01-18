@@ -13,9 +13,9 @@
 #define OPCODE_SQRT 11
 #define OPCODE_FLOAT 12
 
-#define MAX_STEPS 10000
-#define SURFACE_DIST 0.001
-#define MAX_DIST 1000 // avoid stepping into infinity
+#define MAX_STEPS 1000
+#define SURFACE_DIST 0.01
+#define MAX_DIST 100 // avoid stepping into infinity
 #define PI 3.1415926538
 #define HSIZE 32
 #define HSIZEF 32.0
@@ -134,10 +134,10 @@ float sceneDistance(in vec3 p){
     // float planet = sphereDistance(p,vec3(-50,0,60),10*(1+pulseL));
     // float rocket = sceneDistanceCapsule(p,vec3(-40*(1-pulseL),3,40),vec3(-35*(1-pulseR),5,40),0.5);
     // float sun = sphereDistance(p,vec3(30,0,60),30*(1+pulseR));
-    float boxL = sceneDistanceCuboid(p,vec3(-5,1.9,10),vec3(2,4.2,2),0.2);
+    float boxL = sceneDistanceCuboid(p,vec3(-5,3.2,10),vec3(2,3,2),0.2);
     float boxLS = sphereDistance(p,vec3(-5,2,8),1+min(pulseL,1));
     boxL = smoothSubtraction(boxLS, boxL, 0.25);
-    float boxR = sceneDistanceCuboid(p,vec3(5,1.9,10),vec3(2,4.2,2),0.2);
+    float boxR = sceneDistanceCuboid(p,vec3(5,3.2,10),vec3(2,3,2),0.2);
     float boxRS = sphereDistance(p,vec3(5,2,8),1+min(pulseR,1));
     boxR = smoothSubtraction(boxRS, boxR, 0.25);
     float d = min(boxL,boxR);
@@ -157,7 +157,7 @@ float sceneDistance(in vec3 p){
             d = min(d,box);
         }
     }
-    return min(d,p.y);
+    return min(d,p.y+0.0);
 }
 
 // finite difference method
@@ -223,9 +223,9 @@ float getLight(in vec3 p, in vec3 n) {
 
 vec3 getColor(in vec3 p, vec3 n){
     vec3 col = vec3(0.1);
-    vec3 colorXZ = texture(woodTexture, p.xz*0.5+0.5).rgb;
-    vec3 colorYZ = texture(woodTexture, p.zy*0.5+0.5).rgb;
-    vec3 colorXY = texture(woodTexture, p.xy*0.5+0.5).rgb;
+    vec3 colorXZ = texture(woodTexture, p.xz*0.1).rgb;
+    vec3 colorYZ = texture(woodTexture, p.zy*0.1).rgb;
+    vec3 colorXY = texture(woodTexture, p.xy*0.1).rgb;
     vec3 absN = abs(n);
     vec3 mixedSides = colorXZ * absN.y +colorYZ * absN.x + colorXY * absN.z;
     vec4 wood = vec4(mixedSides, smoothstep(0.0,0.05, p.y));
@@ -234,7 +234,7 @@ vec3 getColor(in vec3 p, vec3 n){
     vec4 duck = texture(duckTexture,-abs(p.xy)*0.4+0.5);
     float duckStrength = clamp(0,1,0.2+(pulseL+pulseR));
     duck = vec4(mix(duck.rgb,vec3(1),duckStrength),duck.a);
-    float duckSlider = smoothstep(3.7,3.75,p.y) * smoothstep(6.1,6.0,p.y);;
+    float duckSlider = smoothstep(3.7,3.75,p.y) * smoothstep(6.2,6.1,p.y);;
     float strengthRight = smoothstep(3.5,3.6,p.x)*smoothstep(6.1,6.0,p.x);
     float strengthLeft = smoothstep(-3.8,-3.9,p.x)*smoothstep(-6.1,-6.0,p.x);
     duckSlider *= max(strengthLeft,strengthRight);
@@ -242,6 +242,45 @@ vec3 getColor(in vec3 p, vec3 n){
 
     return col;
 }
+
+vec3 reflectCol(in vec3 p, in vec3 n, in vec3 rayDirection, in vec3 col){
+    float reflectStrength = 0.8+0.2*smoothstep(0.0,0.1,p.y);
+    vec3 refDir = reflect(rayDirection, n);
+    vec3 reflectStartingPoint = p + refDir * 0.1;
+    float reflectPosDistance = march(reflectStartingPoint, refDir);
+    if (reflectPosDistance > MAX_DIST) reflectStrength = 1;
+    vec3 refPos = reflectStartingPoint+refDir*reflectPosDistance;
+    vec3 refColor = getColor(refPos,getNormal(refPos));
+    return mix(refColor, col,reflectStrength);
+}
+
+// constants
+#define GAMMA 2.2f              // gamma value of display, usually 2.2
+#define EV 1.0f                 // exposure value
+#define WHITE_POINT 500.0f     // value which is mapped to plain white by the tone mapper, also known as the "burn value"
+
+// // applies exposure mapping to a linear color value. 0.0 is no change, >0.0 is brighter, <0.0 is darker
+// vec3 exposure_map(vec3 lrgb)
+// {
+//     return lrgb * pow(2, EV);
+// }
+//
+// todo understand?
+// // calculates luminance (perceptual brightness) by converting into CIE XYZ color space and returning the Y component.
+// float get_luminance(vec3 lrgb)
+// {
+//     return dot(vec3(0.2126729f,  0.7151522f,  0.0721750f), lrgb);
+// }
+//
+// // applies extended global reinhard tonemapping
+// vec3 extended_reinhard_tonemap(vec3 lrgb)
+// {
+//     float l_old = get_luminance(lrgb);
+//     float numerator = l_old * (1.0f + (l_old / (WHITE_POINT * WHITE_POINT)));
+//     float l_new = numerator / (1.0f + l_old);
+//     return lrgb * (l_new / l_old);
+// }
+
 
 void main()
 {
@@ -252,7 +291,15 @@ void main()
 
     vec3 position = cameraPos + rayDirection*dist;
     vec3 n = getNormal(position);
+    vec3 col = getColor(position,n);
+    col = reflectCol(position,n, rayDirection, col);
+
     float diffuse = getLight(position,n);
-    color = vec4(getColor(position,n) * diffuse,1);
+    col = col * diffuse;
+
+    // col = exposure_map(col);
+    // col = extended_reinhard_tonemap(col);
+    color = vec4(col,1);
+
 }
 

@@ -14,17 +14,17 @@ WoodTexture::WoodTexture() {
     int width, height, nrChannels;
     unsigned char *data = stbi_load(WIMAGE_PATH, &width, &height, &nrChannels, 0);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(data);
 }
 
 void WoodTexture::bind(ShaderProgram &shaderProgram) {
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, texture);
     std::string name  = "woodTexture";
-    shaderProgram.bind(name,0);
+    shaderProgram.bind(name,2);
 }
 
 DuckTexture::DuckTexture() {
@@ -33,15 +33,15 @@ DuckTexture::DuckTexture() {
     int width, height, nrChannels;
     unsigned char *data = stbi_load(DIMAGE_PATH, &width, &height, &nrChannels, 0);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(data);
 }
 
 void DuckTexture::bind(ShaderProgram &shaderProgram) {
-    glActiveTexture(GL_TEXTURE1);
+    glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, texture);
     std::string name  = "duckTexture";
-    shaderProgram.bind(name,1);
+    shaderProgram.bind(name,3);
 }
