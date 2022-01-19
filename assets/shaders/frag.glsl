@@ -157,7 +157,9 @@ float sceneDistance(in vec3 p){
             d = min(d,box);
         }
     }
-    return min(d,p.y+0.0);
+
+    d =  min(d, 30-length(p));
+    return min(d,p.y);
 }
 
 // finite difference method
@@ -209,8 +211,8 @@ float getLight(in vec3 p, in vec3 n) {
     vec3 lightPos = vec3(0,10,-6);
     vec3 l = normalize(lightPos-p);
     // dot returns between -1 and 1, since both l and n are length 1
-    float s = softshadow(p+n*SURFACE_DIST*2,l,SURFACE_DIST,MAX_DIST,64);
-    float diffuse = clamp(dot(n,l),0,1) * s;
+    float s = softshadow(p+n*SURFACE_DIST*2,l,SURFACE_DIST,length(lightPos-p),64);
+    float diffuse = clamp(dot(n,l),0,1)* s;
     // shadowing
     // float distance = march(p + n*SURFACE_DIST*2,l);
     // if (distance < length(lightPos-p)){ // in shadow
@@ -222,19 +224,19 @@ float getLight(in vec3 p, in vec3 n) {
 }
 
 vec3 getColor(in vec3 p, vec3 n){
-    vec3 col = vec3(0.1);
+    vec3 col = vec3(0.1) + vec3(0,0.4,0.6) * smoothstep(29,30,length(p));
     vec3 colorXZ = texture(woodTexture, p.xz*0.1).rgb;
     vec3 colorYZ = texture(woodTexture, p.zy*0.1).rgb;
     vec3 colorXY = texture(woodTexture, p.xy*0.1).rgb;
     vec3 absN = abs(n);
     vec3 mixedSides = colorXZ * absN.y +colorYZ * absN.x + colorXY * absN.z;
-    vec4 wood = vec4(mixedSides, smoothstep(0.0,0.05, p.y));
+    vec4 wood = vec4(mixedSides, smoothstep(0.0,0.1, p.y)* smoothstep(30,29,length(p)));
     col = mix(col,wood.rgb,wood.a);
 
     vec4 duck = texture(duckTexture,-abs(p.xy)*0.4+0.5);
     float duckStrength = clamp(0,1,0.2+(pulseL+pulseR));
     duck = vec4(mix(duck.rgb,vec3(1),duckStrength),duck.a);
-    float duckSlider = smoothstep(3.7,3.75,p.y) * smoothstep(6.2,6.1,p.y);;
+    float duckSlider = smoothstep(3.7,3.75,p.y) * smoothstep(6.2,6.1,p.y) * smoothstep(30,29,length(p));
     float strengthRight = smoothstep(3.5,3.6,p.x)*smoothstep(6.1,6.0,p.x);
     float strengthLeft = smoothstep(-3.8,-3.9,p.x)*smoothstep(-6.1,-6.0,p.x);
     duckSlider *= max(strengthLeft,strengthRight);
@@ -242,22 +244,51 @@ vec3 getColor(in vec3 p, vec3 n){
 
     return col;
 }
+# define MAX_BOUNCE 32
 
-vec3 reflectCol(in vec3 p, in vec3 n, in vec3 originalRayDirection, in vec3 col){
-    float reflectStrength = 0.2*smoothstep(0.1,0.0,p.y);
-    vec3 reflectedRayDirection = reflect(originalRayDirection, n);
-    // make sure we start with a bit of offset, to not hit against SURFACE_DIST again
-    vec3 reflectStartingPoint = p + reflectedRayDirection * SURFACE_DIST*2.1;
-    float reflectPosDistance = march(reflectStartingPoint, reflectedRayDirection);
-    // don't reflect anything if the ray goes off into the void
-    // todo don't reflect far away
-    if (reflectPosDistance > MAX_DIST) reflectStrength = 0;
-    vec3 reflectionPosition = reflectStartingPoint+reflectedRayDirection*reflectPosDistance;
-    vec3 reflectionColor = getColor(reflectionPosition,getNormal(reflectionPosition));
-    return mix(col, reflectionColor,reflectStrength);
+float reflectStrength(in vec3 p, in vec3 n){
+    return clamp(0.0,1.0, 0.2+ 0.3*smoothstep(0.1,0.0,p.y) + 0.4 * smoothstep(29,30,length(p)));
 }
 
-// constants
+vec3 reflectCol(in vec3 position, in vec3 originalRayDirection, int bounce){
+    int b = bounce;
+    float distance = march(position,originalRayDirection);
+    vec3 p = position + originalRayDirection*distance;
+    vec3 n = getNormal(p);
+    vec3 rd = originalRayDirection;
+
+    vec3 pArr[MAX_BOUNCE];
+    vec3 nArr[MAX_BOUNCE];
+
+    pArr[0] = p;
+    nArr[0] = n;
+
+    for (int i = 1; i <= b; i++) {
+        rd = reflect(rd, n);
+        p = p + rd * SURFACE_DIST*2.1;
+        // make sure we start with a bit of offset, to not hit against SURFACE_DIST again
+        distance = march(p, rd);
+        if (distance >  MAX_DIST){
+            b = i-1;
+            continue;
+        }
+        p = p+rd*distance;
+        n = getNormal(p);
+        pArr[i] = p;
+        nArr[i] = n;
+    }
+
+    vec3 c = vec3(0);
+    for (int i = b; i >= 0; i--){
+        float light = getLight(pArr[i],nArr[i]);
+        vec3 nCol = getColor(pArr[i],nArr[i]) * light;
+        float str = reflectStrength(pArr[i], nArr[i]);
+        c = mix(nCol,c,str*light);
+    }
+    return c;
+}
+
+    // constants
 #define GAMMA 2.2f              // gamma value of display, usually 2.2
 #define EV 1.0f                 // exposure value
 #define WHITE_POINT 500.0f     // value which is mapped to plain white by the tone mapper, also known as the "burn value"
@@ -290,19 +321,14 @@ void main()
     vec2 normFragPos = (gl_FragCoord.xy-0.5*iResolution)/iResolution.y;
     vec4 rd = view * vec4(normFragPos.x,normFragPos.y+0.0,1,0);
     vec3 rayDirection = normalize(rd.xyz);
-    float dist = march(cameraPos,rayDirection);
 
-    vec3 position = cameraPos + rayDirection*dist;
-    vec3 n = getNormal(position);
-    vec3 col = getColor(position,n);
-    col = reflectCol(position,n, rayDirection, col);
+    // vec3 position = cameraPos + rayDirection*dist;
+    // vec3 n = getNormal(position);
+    vec3 col = reflectCol(cameraPos, rayDirection, 1);
 
-    float diffuse = getLight(position,n);
-    col = col * diffuse;
 
     // col = exposure_map(col);
     // col = extended_reinhard_tonemap(col);
     color = vec4(col,1);
-
 }
 
