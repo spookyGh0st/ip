@@ -41,6 +41,7 @@ unsigned int ShaderProgram::createProgram(unsigned int vShader, unsigned int fSh
         glGetShaderInfoLog(id, logLength, NULL, infoLog);
         logError("Shader Program creation failed");
         logError(infoLog);
+        throw std::runtime_error("");
     }
     logDebug("Deleting linked Shaders");
     glDeleteShader(vShader);

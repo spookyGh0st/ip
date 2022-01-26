@@ -19,7 +19,6 @@
 #define PI 3.1415926538
 #define HSIZE 32
 #define HSIZEF 32.0
-// todo histogram name
 
 out vec4 color;
 uniform usamplerBuffer tapeSampler;
@@ -37,7 +36,7 @@ uniform sampler2D duckTexture;
 uniform vec3 cameraPos;
 uniform mat4 view;
 
-float ram[2^8];
+float ram[2^4];
 
 void emulateClause(in uvec4 clause, in vec3 p) {
     switch (clause.r) {
@@ -145,10 +144,10 @@ float sceneDistance(in vec3 p){
     float connectort = capsuleDistance(p,vec3(-3,5,11),vec3(3,2,11),-0.1+0.2*min(pulseR,1));
     d = smoothUnion(connectorb,d,1.3);
     d = smoothUnion(connectort,d,1.3);
-    // todo some artifacts
-    // using branching
+    // using branching, otherwise performance is SHIT
+    // this is the part that eats up the performance
     // todo can we do that better? can we actually use multiple graph from the complex values
-    if(p.x < 5 && p.x > -5 && p.y < 5 && p.y > 0 && p.z > 10 && p.z < 14){
+    if(p.x < 5 && p.x > -5 && p.y < 5 && p.y > 0 && p.z > 9 && p.z < 14){
         for(int i=0; i < HSIZE; i++){
             float v = min(histogram[i],4);
             vec3 pos = vec3((i/HSIZEF-0.5)*5.8,v/2.0,11);
@@ -158,7 +157,8 @@ float sceneDistance(in vec3 p){
         }
     }
 
-    d =  min(d, 30-length(p));
+    // d =  min(d, 30-length(p));
+    // return boxL;
     return min(d,p.y);
 }
 
@@ -206,35 +206,27 @@ float softshadow( in vec3 ro, in vec3 rd, float mint, float maxt, float k ) {
     }
     return res;
 }
-
-float getLight(in vec3 p, in vec3 n) {
-    vec3 lightPos = vec3(0,10,-6);
-    vec3 l = normalize(lightPos-p);
-    // dot returns between -1 and 1, since both l and n are length 1
+vec3 lightPos = vec3(0,10,-6);
+vec3 lightCol = vec3(1000);
+float ambientStrength= 0.1;
+vec3 sampleLight(in vec3 p, in vec3 n, in vec3 l){
     float s = softshadow(p+n*SURFACE_DIST*2,l,SURFACE_DIST,length(lightPos-p),64);
-    float diffuse = clamp(dot(n,l),0,1)* s;
-    // shadowing
-    // float distance = march(p + n*SURFACE_DIST*2,l);
-    // if (distance < length(lightPos-p)){ // in shadow
-    //     diffuse *= 0.1;
-    // }
-    diffuse*=ambientOcclusion(p,n,0.25,5);
-    diffuse*=clamp(0.0,1,0.6+(pulseR+pulseR)*0.5);
-    return diffuse;
+    s*=ambientOcclusion(p,n,0.25,5);
+    return max(s,ambientStrength)*lightCol;
 }
 
 vec3 getColor(in vec3 p, vec3 n){
-    vec3 col = vec3(0.1) + vec3(0,0.4,0.6) * smoothstep(29,30,length(p));
+    vec3 col = vec3(0.0,0.5,0.5) * smoothstep(20,10,length(p.xz-vec2(0,10)));
     vec3 colorXZ = texture(woodTexture, p.xz*0.1).rgb;
     vec3 colorYZ = texture(woodTexture, p.zy*0.1).rgb;
     vec3 colorXY = texture(woodTexture, p.xy*0.1).rgb;
     vec3 absN = abs(n);
     vec3 mixedSides = colorXZ * absN.y +colorYZ * absN.x + colorXY * absN.z;
-    vec4 wood = vec4(mixedSides, smoothstep(0.0,0.1, p.y)* smoothstep(30,29,length(p)));
+    vec4 wood = vec4(mixedSides, smoothstep(0.0,0.1, p.y)* smoothstep(20,10,length(p.xz-vec2(0,10))));
     col = mix(col,wood.rgb,wood.a);
 
     vec4 duck = texture(duckTexture,-abs(p.xy)*0.4+0.5);
-    float duckStrength = clamp(0,1,0.2+(pulseL+pulseR));
+    float duckStrength = clamp(0,1,0.0+0.1*(pulseL+pulseR));
     duck = vec4(mix(duck.rgb,vec3(1),duckStrength),duck.a);
     float duckSlider = smoothstep(3.7,3.75,p.y) * smoothstep(6.2,6.1,p.y) * smoothstep(30,29,length(p));
     float strengthRight = smoothstep(3.5,3.6,p.x)*smoothstep(6.1,6.0,p.x);
@@ -246,74 +238,95 @@ vec3 getColor(in vec3 p, vec3 n){
 }
 # define MAX_BOUNCE 32
 
-float reflectStrength(in vec3 p, in vec3 n){
-    return clamp(0.0,1.0, 0.2+ 0.3*smoothstep(0.1,0.0,p.y) + 0.4 * smoothstep(29,30,length(p)));
+float spec(vec3 p, vec3 n) {
+    return clamp(0.0,1.0, 0.0+ 1.0*smoothstep(0.1,0.0,p.y)+ 1.0 * smoothstep(29,30,length(p)));
+}
+float diffuse(vec3 p, vec3 n) {
+    return 1-spec(p, n);
+}
+vec3 woodMat(vec3 p, vec3 n, vec3 l){
+    float diffuse = clamp(dot(n,l),0,1);
+    // diffuse*=ambientOcclusion(p,n,0.25,5);
+    // diffuse*=clamp(0.0,1,0.6+(pulseR+pulseR)*0.5);
+    vec3 tex = getColor(p,n);
+    return tex * diffuse;
 }
 
-vec3 reflectCol(in vec3 position, in vec3 originalRayDirection, int bounce){
-    int b = bounce;
-    float distance = march(position,originalRayDirection);
-    vec3 p = position + originalRayDirection*distance;
-    vec3 n = getNormal(p);
-    vec3 rd = originalRayDirection;
+// todo understand
+vec3 fresnel_schlick(vec3 F0, float costheta) {
+    return F0 + (vec3(1.0f) - F0) * pow(1.0f - costheta, 5.0f);
+}
 
-    vec3 pArr[MAX_BOUNCE];
-    vec3 nArr[MAX_BOUNCE];
 
-    pArr[0] = p;
-    nArr[0] = n;
+vec3 planeMat(vec3 p, vec3 n, vec3 l, inout vec3 diff, inout vec3 tp, inout vec3 rd){
+    vec3 spec = vec3(0.9);
+    rd = reflect(rd,n);
+    vec3 weightSpec = fresnel_schlick(vec3(0.4),max(0,dot(n,rd)));
+    vec3 weightDiffuse = vec3(1.0)- fresnel_schlick(vec3(0.4),max(0,dot(n,l)));
+    float diffuse = max(0.0,dot(n,l));
+    vec3 tex = getColor(p,n);
+    diff =  diffuse * tex * weightDiffuse * tp; //todo move tp out of function
+    return spec*weightSpec;
+}
 
-    for (int i = 1; i <= b; i++) {
-        rd = reflect(rd, n);
-        p = p + rd * SURFACE_DIST*2.1;
-        // make sure we start with a bit of offset, to not hit against SURFACE_DIST again
-        distance = march(p, rd);
-        if (distance >  MAX_DIST){
-            b = i-1;
-            continue;
-        }
-        p = p+rd*distance;
+vec3 reflectCol(vec3 p, vec3 rd, int bounce){
+    vec3 outputColor = vec3(0);
+    vec3 tp = vec3(1);
+    vec3 n;
+    for (int i = 1; i <= bounce; i++) {
+        float distance = march(p,rd);
+        p = p + rd*distance;
         n = getNormal(p);
-        pArr[i] = p;
-        nArr[i] = n;
-    }
 
-    vec3 c = vec3(0);
-    for (int i = b; i >= 0; i--){
-        float light = getLight(pArr[i],nArr[i]);
-        vec3 nCol = getColor(pArr[i],nArr[i]) * light;
-        float str = reflectStrength(pArr[i], nArr[i]);
-        c = mix(nCol,c,str*light);
+        // color
+        float d = diffuse(p,n);
+        float fallo = length(lightPos-p);
+        // point light
+        // vec3 l = (lightPos-p)/fallo; // normalize
+        // static light
+        vec3 l = normalize(vec3(1,5,-10));
+        fallo = 1/(fallo*fallo);
+
+        vec3 diff;
+        if (d > 0.5) { // todo change
+            outputColor += woodMat(p,n,l) * fallo * sampleLight(p,n,l) * tp;
+            break;
+        }else{
+            vec3 diff;
+            tp *= planeMat(p,n,l,diff,tp, rd);
+            outputColor += diff * fallo * sampleLight(p,n,l);
+        }
+        p = p + rd * SURFACE_DIST*2.1;
     }
-    return c;
+    return outputColor;
 }
 
     // constants
 #define GAMMA 2.2f              // gamma value of display, usually 2.2
-#define EV 1.0f                 // exposure value
-#define WHITE_POINT 500.0f     // value which is mapped to plain white by the tone mapper, also known as the "burn value"
+#define EV 0.0f                 // exposure value
+#define WHITE_POINT 5000.0f     // value which is mapped to plain white by the tone mapper, also known as the "burn value"
 
-// // applies exposure mapping to a linear color value. 0.0 is no change, >0.0 is brighter, <0.0 is darker
-// vec3 exposure_map(vec3 lrgb)
-// {
-//     return lrgb * pow(2, EV);
-// }
-//
+// applies exposure mapping to a linear color value. 0.0 is no change, >0.0 is brighter, <0.0 is darker
+vec3 exposure_map(vec3 lrgb)
+{
+    return lrgb * pow(2, EV);
+}
+
 // todo understand?
-// // calculates luminance (perceptual brightness) by converting into CIE XYZ color space and returning the Y component.
-// float get_luminance(vec3 lrgb)
-// {
-//     return dot(vec3(0.2126729f,  0.7151522f,  0.0721750f), lrgb);
-// }
-//
-// // applies extended global reinhard tonemapping
-// vec3 extended_reinhard_tonemap(vec3 lrgb)
-// {
-//     float l_old = get_luminance(lrgb);
-//     float numerator = l_old * (1.0f + (l_old / (WHITE_POINT * WHITE_POINT)));
-//     float l_new = numerator / (1.0f + l_old);
-//     return lrgb * (l_new / l_old);
-// }
+// calculates luminance (perceptual brightness) by converting into CIE XYZ color space and returning the Y component.
+float get_luminance(vec3 lrgb)
+{
+    return dot(vec3(0.2126729f,  0.7151522f,  0.0721750f), lrgb);
+}
+
+// applies extended global reinhard tonemapping
+vec3 extended_reinhard_tonemap(vec3 lrgb)
+{
+    float l_old = get_luminance(lrgb);
+    float numerator = l_old * (1.0f + (l_old / (WHITE_POINT * WHITE_POINT)));
+    float l_new = numerator / (1.0f + l_old);
+    return lrgb * (l_new / l_old);
+}
 
 
 void main()
@@ -324,7 +337,7 @@ void main()
 
     // vec3 position = cameraPos + rayDirection*dist;
     // vec3 n = getNormal(position);
-    vec3 col = reflectCol(cameraPos, rayDirection, 1);
+    vec3 col = reflectCol(cameraPos, rayDirection, 3);
 
 
     // col = exposure_map(col);
