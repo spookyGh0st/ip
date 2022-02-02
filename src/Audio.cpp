@@ -35,6 +35,7 @@ AudioFile::~AudioFile() {
     checkSfError(err);
 }
 
+
 // similar to https://pastebin.com/2TuuU4K3
 void AudioFile::read(unsigned long framesPerBuffer, float *cursor) {
     unsigned long thisSize = framesPerBuffer;
@@ -63,7 +64,12 @@ void AudioFile::read(unsigned long framesPerBuffer, float *cursor) {
         /* since our output format and channel interleaving is the same as
     sf_readf_int's requirements */
         /* we'll just read straight into the output buffer */
-        sf_readf_float(sndFile, cursor, long(thisRead));
+        float arr [128*2]{};
+        sf_readf_float(sndFile, arr, long(thisRead));
+        for(int i = 0; i< 128*2; i++){
+            *cursor = arr[i]*0.2;
+            cursor++;
+        }
         /* increment the output cursor*/
         // cursor += thisRead;
         /* decrement the number of samples left to process */
@@ -118,8 +124,6 @@ kissFftrCfg(kiss_fftr_alloc(NFFT,0, nullptr, nullptr))
 {
 
 
-
-
 }
 
 
@@ -132,7 +136,8 @@ AudioData AudioSync::read(float dt) {
     AudioData data{};
     auto millisec = int(dt * 1000);
     if (millisec < 1) return data;
-    auto framesPerBuffer  = millisec * audioVisualizerFile.sfInfo.samplerate / 1000;
+    // auto framesPerBuffer  = millisec * audioVisualizerFile.sfInfo.samplerate / 1000;
+    auto framesPerBuffer  = 128; // millisec * audioVisualizerFile.sfInfo.samplerate / 1000;
     audioVisualizerFile.position = audioPlaybackFile.position-framesPerBuffer;
     long n = framesPerBuffer * audioVisualizerFile.sfInfo.channels;
     if (n % 2 == 1) n++; // make sure we have an even number for the fft
@@ -164,4 +169,33 @@ AudioData AudioSync::read(float dt) {
     data.rightTotal = outputR;
     data.leftTotal = outputL;
     return data;
+}
+
+AudioRecording::AudioRecording() {
+    int i;
+    int totalFrames;
+    int numSamples;
+    int numBytes;
+    double average;
+    PaStreamParameters parameters;
+    parameters.device = Pa_GetDefaultInputDevice();
+    if (parameters.device == paNoDevice){
+        logError("No Default Input Device");
+    }
+    auto info = Pa_GetDeviceInfo(parameters.device);
+    parameters.channelCount = info->maxInputChannels;
+    parameters.sampleFormat = paFloat32;
+    parameters.suggestedLatency = info->defaultLowInputLatency;
+    parameters.hostApiSpecificStreamInfo = nullptr;
+    auto err = Pa_OpenStream(
+            &stream,
+            &parameters,
+            nullptr,
+            44100, // todo move out sample rate
+            64, // todo sync
+            paClipOff,
+            paCallback,
+            &data
+            );
+    checkPaError(err);
 }

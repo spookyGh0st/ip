@@ -42,6 +42,19 @@ private:
     PaStream *stream{};
     AudioFile *audioFile ;
 };
+class RecordingData {
+    int frameIndex;
+    int maxFrameIndex;
+    float *recordedSamples;
+};
+
+class AudioRecording {
+    AudioRecording();
+    ~AudioRecording();
+    RecordingData data;
+private:
+    PaStream *stream{};
+};
 
 #define NFFT 64
 
