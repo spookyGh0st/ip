@@ -23,4 +23,4 @@ find_library(sndfile sndfile REQUIRED)
 
 target_include_directories(ip PRIVATE include)
 target_link_libraries(ip PUBLIC kissfft-float glfw OpenGL::GL glm::glm portaudio sndfile ${CMAKE_DL_LIBS})
-target_compile_options(ip PRIVATE -Wall -Wextra)
+target_compile_options(ip PRIVATE -Wall -Wextra -ffast-math)

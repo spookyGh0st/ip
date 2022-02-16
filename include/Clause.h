@@ -22,7 +22,6 @@ enum Opcode: uint8_t {
     OPCODE_FLOAT = 12,
 };
 
-// note: this wastes 4 byte, but atm is chosen for simplicity and performance reasons
 class alignas(4) Clause {
 public:
     Opcode opcode;    // 1 byte

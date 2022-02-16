@@ -61,6 +61,9 @@ Window::Window() {
     glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
+    // disable fps lock
+    // glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_FALSE);
+
     int count, monitor_x, monitor_y;
     GLFWmonitor** ml = glfwGetMonitors(&count);
     GLFWmonitor* m = ml[count-1];
