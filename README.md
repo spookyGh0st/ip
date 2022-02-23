@@ -1,4 +1,4 @@
-# Mariana
+# Mariana 🦆
 
 ![duck](https://upload.wikimedia.org/wikipedia/commons/1/1a/Anas_platyrhynchos_oustaleti_last_male.jpg)
 
@@ -15,14 +15,17 @@ Bau eines Renderers auf Basis von implizierten Oberflaechen.
 - [x] Ambient Occlusion
 - [x] soft shadows
 - [x] coloring/texturing?
-- [ ] Doc schreiben
+- [x] Doc schreiben
 
-## Bau
+## Building
 
-The project includes libraries using git submodules when possible.
-Make sure you set those up when working with it.
-Additionally the following libraries have to be installed
-- kissfft
+The following libraries must be installed to build with cmake
+- glfw3 3.3 REQUIRED
+- OpenGL REQUIRED
+- kissfft REQUIRED
+- glm REQUIRED
+- portaudio portaudio REQUIRED
+- sndfile sndfile REQUIRED
 
 # Topics I discovered while doing this project
 
