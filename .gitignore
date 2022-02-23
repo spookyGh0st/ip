@@ -128,6 +128,8 @@ fabric.properties
 literature/books/*.pdf
 literature/books/*.epub
 literature/books/*.mobi
+literature/papers/*.pdf
+literature/keeter2020/*.pdf
 
 /ip.cbp
 /.idea/
