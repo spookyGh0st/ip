@@ -326,7 +326,7 @@ vec3 reflectCol(vec3 p, vec3 rd, int bounce){
 
     // constants
 #define GAMMA 2.2f              // gamma value of display, usually 2.2
-#define EV 0.0f                 // exposure value
+#define EV -1.0f                // exposure value
 #define WHITE_POINT 5000.0f     // value which is mapped to plain white by the tone mapper, also known as the "burn value"
 
 // applies exposure mapping to a linear color value. 0.0 is no change, >0.0 is brighter, <0.0 is darker
