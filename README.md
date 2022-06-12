@@ -2,6 +2,8 @@
 
 ![duck](https://upload.wikimedia.org/wikipedia/commons/1/1a/Anas_platyrhynchos_oustaleti_last_male.jpg)
 
+https://youtu.be/uRfuHaP_5FA
+
 ## Battleplan
 
 Bau eines Renderers auf Basis von implizierten Oberflaechen.
